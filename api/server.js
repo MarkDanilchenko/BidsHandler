@@ -29,16 +29,15 @@ server.use(express.urlencoded({ extended: false }));
 // 	res.setHeader('Content-Type', 'multipart/form-data');
 // 	next();
 // });
-server.use(express.static(`${__dirname}/node_modules`));
-server.use(express.static(`${__dirname}/assets`));
+server.use('/api/v1', express.static(`${__dirname}/node_modules`));
+server.use('/api/v1', express.static(`${__dirname}/assets`));
 
 // --------------------------------------ROUTES
 server.use('/api/v1', APIRouter);
 
-// http://127.0.0.1:3000/ GREETING_ROUTE
-server.get('/', (req, res) => {
-    res.setHeader('Content-Type', 'text/html');
-    res.render('index.html');
+// http://127.0.0.1:3000/ - GREETING_ROUTE
+server.all('/', (req, res) => {
+	res.status(302).redirect('/api/v1');
 });
 
 // --------------------------------------EXPORT

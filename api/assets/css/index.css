@@ -1,0 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+.pacifico-regular {
+  font-family: "Pacifico", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.container {
+  min-height: 100vh;
+}
+
+.my-footer {
+  position: sticky;
+  top: 100vh;
+}
+
+.my-content {
+  color: rgb(205, 205, 205);
+  position: relative;
+  top: 15vh;
+}
+.my-content h4 > div {
+  text-align: justify;
+}
+
+header img {
+  width: 50px;
+  height: 50px;
+}
+
+/*# sourceMappingURL=index.css.map */

@@ -72,16 +72,14 @@ Technologies used:
     <span style="font-size: smaller">request:</span> ->
 
     ```
-    http://0.0.0.0:3001/test
+    http://0.0.0.0:3000/
     ```
 
     <span style="font-size: smaller">response (json):</span> ->
 
-    ```
-    {
-        "message": "TEST IS OK!" 
-    }
-    ```
+    <div align="center">
+    <img src="./screenshots/ScrShot_1.png" width="75%" height="75%" alt='Greeting page of the API.'>
+    </div>
 
 2. **API URLs**
 
