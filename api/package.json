@@ -5,9 +5,11 @@
 	"main": "index.js",
 	"type": "commonjs",
 	"scripts": {
+		"scss": "sass --watch ./assets/scss/index.scss:./assets/css/index.css",
+		"dev": "concurrently \"nodemon index.js\" \"npm run scss\"",
 		"test": "mocha ./tests/*.test.js",
-		"scss_convert": "sass --watch ./assets/scss/index.scss:./assets/css/index.css",
-		"dev": "concurrently \"nodemon index.js\" \"npm run scss_convert\""
+		"swagger": "node ./docs/swagger/index.js",
+		"start": "node index.js"
 	},
 	"keywords": [],
 	"author": "",
@@ -34,6 +36,9 @@
 		"pg": "^8.12.0",
 		"sass": "^1.77.4",
 		"sequelize": "^6.37.3",
-		"supertest": "^7.0.0"
+		"supertest": "^7.0.0",
+		"swagger-autogen": "^2.23.7",
+		"swagger-ui-express": "^5.0.1",
+		"swagger2openapi": "^7.0.8"
 	}
 }
