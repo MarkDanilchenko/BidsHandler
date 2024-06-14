@@ -10,7 +10,7 @@ const { sequelize } = require('./models/db_orm.js');
 (async () => {
 	try {
 		await sequelize
-			.sync({ force: true })
+			.sync({ force: false })
 			.then(() => {
 				console.log(`PostgresQL connected!`);
 				server.listen(port_server, host_server, () => {

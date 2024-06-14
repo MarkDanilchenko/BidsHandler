@@ -1,10 +1,12 @@
+const path = require('path');
+const fs = require('fs');
 const request = require('supertest');
 const nunjucks = require('nunjucks');
 const { server } = require('../server.js');
 const dotenv = require('dotenv');
-dotenv.config({ path: '../../.env' });
+dotenv.config({ path: `${path.relative(__dirname, '.env')}` });
 
-describe('API routes', () => {
+describe('API common routes', () => {
 	it('Requests with all methods on "http://127.0.0.1:3000" redirects to "http://127.0.0.1:3000/api/v1"', (done) => {
 		request(server)
 			.get('/')
@@ -23,18 +25,6 @@ describe('API routes', () => {
 			.expect(200)
 			.expect('Content-Type', 'text/html; charset=utf-8')
 			.expect(nunjucks.render('main.html', { server_host: `${process.env.SERVER_HOST ?? '127.0.0.1'}` }))
-			.end((err, res) => {
-				if (err) {
-					return done(err);
-				}
-				done();
-			});
-	});
-	it('Swagger docummentation service with GET method on "http://127.0.0.1:3000/api/v1/docs"', (done) => {
-		request(server)
-			.get('/api/v1/docs/')
-			.expect(200)
-			.expect('Content-Type', 'text/html; charset=utf-8')
 			.end((err, res) => {
 				if (err) {
 					return done(err);
@@ -63,5 +53,26 @@ describe('API routes', () => {
 				}
 				done();
 			});
+	});
+});
+
+describe('API docs routes', () => {
+	it('Swagger docummentation service with GET method on "http://127.0.0.1:3000/api/v1/docs"', (done) => {
+		request(server)
+			.get('/api/v1/docs/')
+			.expect(200)
+			.expect('Content-Type', 'text/html; charset=utf-8')
+			.end((err, res) => {
+				if (err) {
+					return done(err);
+				}
+				done();
+			});
+	});
+});
+
+describe('API auth routes', () => {
+	it('User\'s successful registration with POST method on "http://127.0.0.1:3000/api/v1/signup"', (done) => {
+		done();
 	});
 });

@@ -10,7 +10,6 @@ const User = sequelize.define('user', {
 		unique: true,
 		validate: {
 			is: /^[a-zA-Z0-9_\.\-]+$/,
-			msg: 'The username can only contain letters, numbers, underscores, dots and dashes.',
 		},
 	},
 	email: {
@@ -19,7 +18,6 @@ const User = sequelize.define('user', {
 		unique: true,
 		validate: {
 			isEmail: true,
-			msg: 'The email must be a valid email address.',
 		},
 	},
 	first_name: {
@@ -28,7 +26,6 @@ const User = sequelize.define('user', {
 		unique: false,
 		validate: {
 			is: /^[a-zA-Z]{2,}$/,
-			msg: 'The first name can only contain letters and must be at least 2 characters long.',
 		},
 	},
 	last_name: {
@@ -37,7 +34,6 @@ const User = sequelize.define('user', {
 		unique: false,
 		validate: {
 			is: /^[a-zA-Z]{2,}$/,
-			msg: 'The last name can only contain letters and must be at least 2 characters long.',
 		},
 	},
 	avatar: {
@@ -57,7 +53,6 @@ const User = sequelize.define('user', {
 		defaultValue: Sequelize.NOW,
 		validate: {
 			isDate: true,
-			msg: 'Invalid date format.',
 		},
 	},
 });
@@ -69,7 +64,6 @@ const UserRole = sequelize.define('user_role', {
 		defaultValue: 'user',
 		validate: {
 			isIn: [['admin', 'user']],
-			msg: 'Invalid role. Only "admin" and "user" are allowed.',
 		},
 	},
 });
@@ -81,7 +75,6 @@ const UserRequest = sequelize.define('user_request', {
 		defaultValue: 'active',
 		validate: {
 			isIn: [['active', 'resolved']],
-			msg: 'Invalid status. Only "active" and "resolved" are allowed.',
 		},
 	},
 	message: {
@@ -91,7 +84,6 @@ const UserRequest = sequelize.define('user_request', {
 		validate: {
 			notEmpty: true,
 			len: [1, 1000],
-			msg: 'Text message should be between 1 and 1000 characters.',
 		},
 	},
 	comment: {
@@ -114,7 +106,6 @@ const UserRequest = sequelize.define('user_request', {
 		defaultValue: Sequelize.NOW,
 		validate: {
 			isDate: true,
-			msg: 'Invalid date format.',
 		},
 	},
 	updated_at: {
@@ -124,7 +115,6 @@ const UserRequest = sequelize.define('user_request', {
 		defaultValue: null,
 		validate: {
 			isDate: true,
-			msg: 'Invalid date format.',
 		},
 	},
 });
@@ -145,6 +135,12 @@ const TokenBlacklist = sequelize.define(
 // --------------------------------------MODELS_RELATIONS
 UserRole.hasMany(User, {
 	onDelete: 'cascade',
+	foreignKey: {
+		allowNull: false,
+		name: 'user_role_id',
+	},
+});
+User.belongsTo(UserRole, {
 	foreignKey: {
 		allowNull: false,
 		name: 'user_role_id',
