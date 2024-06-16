@@ -91,7 +91,13 @@ router
 // http://127.0.0.1:3000/api/v1/requests - POST_A_REQUEST_ROUTE (FOR USER), GET_ALL_REQUESTS_ROUTE (FOR ADMIN)
 router
 	.route('/requests')
-	.get()
+	.get(
+		header('Authorization', 'Bearer access token should be provided!').exists(),
+		body('request_status').exists().isIn(['active', 'resolved']),
+		routesDataValidation,
+		verifyToken,
+		RequestController.getRequests
+	)
 	.post(
 		header('Authorization', 'Bearer access token should be provided!').exists(),
 		body('request_message').exists(),
@@ -101,7 +107,10 @@ router
 	);
 
 // http://127.0.0.1:3000/api/v1/requests - PUT_A_REQUEST_ROUTE (FOR ADMIN), DELETE_A_REQUEST_ROUTE (FOR ADMIN)
-router.route('/requests/:id').put().delete();
+router
+	.route('/requests/:id')
+	.put(header('Authorization', 'Bearer access token should be provided!').exists())
+	.delete(header('Authorization', 'Bearer access token should be provided!').exists());
 
 // http://127.0.0.1:3000/api/v1/* - NOT_FOUND
 router.route('*').get(async (req, res) => {
