@@ -6,7 +6,7 @@ const bcryptjs = require('bcryptjs');
 const JWT = require('jsonwebtoken');
 const { jwt_config } = require('../services/jwt_config.js');
 const { User, TokenBlacklist, UserRole } = require('../models/db_orm.js');
-const { Op, where } = require('sequelize');
+const { Op } = require('sequelize');
 
 // --------------------------------------CONTROLLER
 class AuthController {
@@ -17,6 +17,98 @@ class AuthController {
 			#swagger.description = 'This is the end-point for the registration of new users in the system. Both users and admins can use it.'
 		*/
 		// #swagger.operationId = 'signup'
+		/*
+			#swagger.requestBody = {
+				required: true,
+				content: {
+					'multipart/form-data': {
+						schema: {
+							$ref: '#/components/schemas/SignUp_schema'
+						}
+					}
+				}
+			}
+		*/
+		/*
+			#swagger.responses[201] = {
+				description: 'Created',
+				content: {
+					'application/json': {
+						schema: {
+							type: 'object',
+							required: ['message'],
+							properties: {
+								message: {
+									type: 'string',
+									format: 'string',
+									examples: 'User signed up successfully!',
+									description: 'Message of the successful signup of the user response',
+								}
+							}
+						}
+					}
+				}
+			}
+			#swagger.responses[400] = {
+				description: 'Bad request',
+				content: {
+					'application/json': {
+						schema: {
+							type: 'object',
+							required: ['message'],
+							properties: {
+								message: {
+									type: 'string',
+									format: 'string',
+									examples: 'Invalid role. Should be "user" or "admin".',
+									description: 'Error message of the bad request response',
+								}
+							}
+						}
+					}
+				}
+			}
+			#swagger.responses[413] = {
+				description: 'Payload too large',
+				content: {
+					'application/json': {
+						schema: {
+							$ref: '#/components/schemas/Error413_schema'
+						}
+					}
+				}
+			}
+			#swagger.responses[415] = {
+				description: 'Unsupported media type',
+				content: {
+					'application/json': {
+						schema: {
+							$ref: '#/components/schemas/Error415_schema'
+						}
+					}
+				}
+			}
+			#swagger.responses[422] = {
+				description: 'Unprocessable entity',
+				content: {
+					'application/json': {
+						schema: {
+							$ref: '#/components/schemas/Error422_schema'
+						}
+					}
+				}
+			}
+			#swagger.responses[500] = {
+				description: 'Internal server error',
+				content: {
+					'application/json': {
+						schema: {
+							$ref: '#/components/schemas/Error500_schema'
+						}
+					}
+				}
+			}
+		*/
 		try {
 			if (req.avatar_formatError) {
 				throw new Error(req.avatar_formatError);
@@ -45,6 +137,7 @@ class AuthController {
 							message: `User: ${req.body.username} was created successfully!`,
 						});
 						res.end();
+						return;
 					});
 			});
 		} catch (error) {
@@ -78,6 +171,7 @@ class AuthController {
 				message: error.message,
 			});
 			res.end();
+			return;
 		}
 	}
 
@@ -88,6 +182,88 @@ class AuthController {
 			#swagger.description = 'This is the end-point for the signing in of registered users in the system.'
 		*/
 		// #swagger.operationId = 'signin'
+		/*
+		   #swagger.requestBody = {
+			   required: true,
+			   content: {
+				   'application/json': {
+					   schema: {
+						oneOf: [
+							{
+								$ref: '#/components/schemas/SignInWithEmail_schema'
+							},
+							{
+								$ref: '#/components/schemas/SignInWithUsername_schema'
+							}
+						]
+					   	}
+					}
+				}
+		   }
+		*/
+		/*
+		#swagger.responses[200] = {
+				description: 'OK',
+				content: {
+					'application/json': {
+						schema: {
+							type: 'object',
+							required: ['message', 'token_access', 'token_refresh'],
+							properties: {
+								message: {
+									type: 'string',
+									format: 'string',
+									example: 'User signed in successfully!',
+									description: 'Message of the successful sign in response',
+								},
+								token_access: {
+									type: 'string',
+									format: 'string',
+									example: 'eyJhbGciOiJIUzI1NiIsInR...',
+									description: 'Access token for the signed in user',
+								},
+								token_refresh: {
+									type: 'string',
+									format: 'string',
+									example: 'eyJhbGciOjJIUzI1NiIsInR...',
+									description: 'Refresh token for the signed in user',
+								}
+							}
+						}
+					}
+				}
+			}
+			#swagger.responses[401] = {
+				description: 'Unauthorized',
+				content: {
+					'application/json': {
+						schema: {
+							$ref: '#/components/schemas/Error401_schema'
+						}
+					}
+				}
+			}
+			#swagger.responses[422] = {
+				description: 'Unprocessable Entity',
+				content: {
+					'application/json': {
+						schema: {
+							$ref: '#/components/schemas/Error422_schema'
+						}
+					}
+				}
+			}
+			#swagger.responses[500] = {
+				description: 'Internal server error',
+				content: {
+					'application/json': {
+						schema: {
+							$ref: '#/components/schemas/Error500_schema'
+						}
+					}
+				}
+			}
+		 */
 		try {
 			const email = req.body.email ? req.body.email : null;
 			const username = req.body.username ? req.body.username : null;
@@ -188,7 +364,7 @@ class AuthController {
 			}
 
 			#swagger.responses[401] = {
-				description: 'Unauthorized. User is not authenticated',
+				description: 'Unauthorized',
 				content: {
 					'application/json': {
 						schema: {
@@ -287,7 +463,7 @@ class AuthController {
 			}
 		}
 		 	#swagger.responses[401] = {
-		 	description: 'Unauthorized. User is not authenticated',
+		 	description: 'Unauthorized',
 		 	content: {
 		 		'application/json': {
 		 			schema: {

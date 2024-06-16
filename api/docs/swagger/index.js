@@ -52,8 +52,32 @@ const documentation = {
 					message: {
 						type: 'string',
 						format: 'string',
-						example: 'Unauthorized. User is not authenticated',
+						examples: 'Unauthorized. User is not authenticated',
 						description: 'Error message of the unauthorized response',
+					},
+				},
+			},
+			Error413_schema: {
+				type: 'object',
+				required: ['message'],
+				properties: {
+					message: {
+						type: 'string',
+						format: 'string',
+						example: 'File size is too big. Should be less than 10 MB.',
+						description: 'Error message of the payload too large response',
+					},
+				},
+			},
+			Error415_schema: {
+				type: 'object',
+				required: ['message'],
+				properties: {
+					message: {
+						type: 'string',
+						format: 'string',
+						example: 'Incorrect file format for avatar. Only .png, .jpg and .jpeg formats are allowed!',
+						description: 'Error message of the unsupported media type response',
 					},
 				},
 			},
@@ -126,6 +150,102 @@ const documentation = {
 						format: 'string',
 						example: 'user',
 						description: 'Users role',
+					},
+				},
+			},
+			SignInWithEmail_schema: {
+				type: 'object',
+				required: ['password', 'email'],
+				properties: {
+					password: {
+						type: 'string',
+						format: 'string',
+						example: 'ronald123',
+						description: 'Users password',
+					},
+					email: {
+						type: 'string',
+						format: 'string',
+						example: 'ronald123@example.com',
+						description: 'Users email',
+					},
+					username: {
+						type: 'string',
+						format: 'string',
+						example: 'ronald10',
+						description: 'Users username',
+					},
+				},
+			},
+			SignInWithUsername_schema: {
+				type: 'object',
+				required: ['password', 'username'],
+				properties: {
+					password: {
+						type: 'string',
+						format: 'string',
+						example: 'ronald123',
+						description: 'Users password',
+					},
+					username: {
+						type: 'string',
+						format: 'string',
+						example: 'ronald10',
+						description: 'Users username',
+					},
+					email: {
+						type: 'string',
+						format: 'string',
+						example: 'ronald123@example.com',
+						description: 'Users email',
+					},
+				},
+			},
+			SignUp_schema: {
+				type: 'object',
+				required: ['username', 'email', 'password'],
+				properties: {
+					username: {
+						type: 'string',
+						format: 'string',
+						example: 'ronald10',
+						description: 'Users username',
+					},
+					email: {
+						type: 'string',
+						format: 'string',
+						example: 'ronald123@example.com',
+						description: 'Users email',
+					},
+					password: {
+						type: 'string',
+						format: 'string',
+						example: 'ronald123',
+						description: 'Users password',
+					},
+					first_name: {
+						type: 'string',
+						format: 'string',
+						example: 'Ronald',
+						description: 'Users First name',
+					},
+					last_name: {
+						type: 'string',
+						format: 'string',
+						example: 'Doe',
+						description: 'Users Last name',
+					},
+					role: {
+						type: 'string',
+						format: 'string',
+						example: 'user',
+						description: 'Users role',
+						enum: ['admin', 'user'],
+					},
+					avatar: {
+						type: 'string',
+						format: 'binary',
+						description: 'Users avatar',
 					},
 				},
 			},
