@@ -133,6 +133,7 @@ const TokenBlacklist = sequelize.define(
 );
 
 // --------------------------------------MODELS_RELATIONS
+// ---
 UserRole.hasMany(User, {
 	onDelete: 'cascade',
 	foreignKey: {
@@ -146,6 +147,7 @@ User.belongsTo(UserRole, {
 		name: 'user_role_id',
 	},
 });
+// ---
 User.hasMany(UserRequest, {
 	onDelete: 'cascade',
 	foreignKey: {
@@ -153,8 +155,21 @@ User.hasMany(UserRequest, {
 		name: 'created_by',
 	},
 });
+UserRequest.belongsTo(User, {
+	foreignKey: {
+		allowNull: false,
+		name: 'created_by',
+	},
+});
+// ---
 User.hasMany(UserRequest, {
 	onDelete: 'cascade',
+	foreignKey: {
+		allowNull: true,
+		name: 'resolved_by',
+	},
+});
+UserRequest.belongsTo(User, {
 	foreignKey: {
 		allowNull: true,
 		name: 'resolved_by',

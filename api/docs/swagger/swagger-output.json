@@ -176,18 +176,62 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "User signed out successfully!",
+                      "description": "Message of the successful sign out response"
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized. User is not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401_schema"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Unprocessable Entity"
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422_schema"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500_schema"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/refresh": {
@@ -196,7 +240,7 @@
           "Reg&Auth"
         ],
         "summary": "Refresh of the access token end-point.",
-        "description": "",
+        "description": "This is the end-point for the refreshing of the access token of registered users in the system.",
         "operationId": "refresh",
         "parameters": [
           {
@@ -209,18 +253,125 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "token_access"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "Access token has been successfully refresh!",
+                      "description": "Message of the successful refresh of the access token response"
+                    },
+                    "token_access": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR...",
+                      "description": "Access token of the user"
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized. User is not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401_schema"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Unprocessable Entity"
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422_schema"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500_schema"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": [
+          "Reg&Auth"
+        ],
+        "summary": "User profile end-point.",
+        "description": "This is the end-point for the user profile of registered users in the system.",
+        "operationId": "profile",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile_schema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422_schema"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500_schema"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     }
   },
@@ -232,25 +383,103 @@
       }
     },
     "schemas": {
-      "ServerError_schema": {
+      "Error401_schema": {
         "type": "object",
+        "required": [
+          "message"
+        ],
         "properties": {
           "message": {
             "type": "string",
-            "example": "Internal server error"
+            "format": "string",
+            "example": "Unauthorized. User is not authenticated",
+            "description": "Error message of the unauthorized response"
           }
-        },
+        }
+      },
+      "Error422_schema": {
+        "type": "object",
         "required": [
           "message"
-        ]
-      }
-    },
-    "examples": {
-      "ServerError_example": {
-        "value": {
-          "message": "Internal server error"
-        },
-        "summary": "The response message of the server error"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "format": "string",
+            "example": "Unprocessable Entity",
+            "description": "Error message of the unprocessable entity response"
+          }
+        }
+      },
+      "Error500_schema": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "format": "string",
+            "example": "Internal server error",
+            "description": "Error message of the internal server error response"
+          }
+        }
+      },
+      "UserProfile_schema": {
+        "type": "object",
+        "required": [
+          "username",
+          "email",
+          "first_name",
+          "last_name",
+          "avatar",
+          "created_at",
+          "role"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "format": "string",
+            "example": "Ronald10",
+            "description": "Username in the system"
+          },
+          "email": {
+            "type": "string",
+            "format": "string",
+            "example": "ronald123@example.com",
+            "description": "Users email"
+          },
+          "first_name": {
+            "type": "string",
+            "format": "string",
+            "example": "Ronald",
+            "description": "Users First name"
+          },
+          "last_name": {
+            "type": "string",
+            "format": "string",
+            "example": "Doe",
+            "description": "Users Last name"
+          },
+          "avatar": {
+            "type": "string",
+            "format": "string",
+            "example": "/avatar.png",
+            "description": "Users avatar"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-01-01T00:00:00.000Z",
+            "description": "Users creation date"
+          },
+          "role": {
+            "type": "string",
+            "format": "string",
+            "example": "user",
+            "description": "Users role"
+          }
+        }
       }
     }
   }

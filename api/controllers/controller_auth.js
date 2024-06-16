@@ -14,8 +14,8 @@ class AuthController {
 		// #swagger.tags = ['Reg&Auth']
 		// #swagger.summary = 'Sign up end-point.'
 		/* 
-	        #swagger.description = 'This is the end-point for the registration of new users in the system. Both users and admins can use it.'
-	    */
+			#swagger.description = 'This is the end-point for the registration of new users in the system. Both users and admins can use it.'
+		*/
 		// #swagger.operationId = 'signup'
 		try {
 			if (req.avatar_formatError) {
@@ -85,8 +85,8 @@ class AuthController {
 		// #swagger.tags = ['Reg&Auth']
 		// #swagger.summary = 'Sign in end-point.'
 		/* 
-	        #swagger.description = 'This is the end-point for the signing in of registered users in the system.'
-	    */
+			#swagger.description = 'This is the end-point for the signing in of registered users in the system.'
+		*/
 		// #swagger.operationId = 'signin'
 		try {
 			const email = req.body.email ? req.body.email : null;
@@ -162,9 +162,64 @@ class AuthController {
 		// #swagger.tags = ['Reg&Auth']
 		// #swagger.summary = 'Sign out end-point.'
 		/* 
-	        #swagger.description = 'This is the end-point for the signing out of registered users in the system and blacklisting their refresh tokens permanently.'
-	    */
+			#swagger.description = 'This is the end-point for the signing out of registered users in the system and blacklisting their refresh tokens permanently.'
+		*/
 		// #swagger.operationId = 'signout'
+		// #swagger.security = [{"bearerAuth": []}]
+		/*
+			#swagger.responses[200] = {
+				description: 'OK',
+				content: {
+					'application/json': {
+						schema: {
+							type: 'object',
+							required: ['message'],
+							properties: {
+								message: {
+									type: 'string',
+									format: 'string',
+									example: 'User signed out successfully!',
+									description: 'Message of the successful sign out response',
+								}
+							}
+						}
+					}
+				}
+			}
+
+			#swagger.responses[401] = {
+				description: 'Unauthorized. User is not authenticated',
+				content: {
+					'application/json': {
+						schema: {
+							$ref: '#/components/schemas/Error401_schema',
+							},
+						},
+					}
+				}
+
+			#swagger.responses[422] = {
+				description: 'Unprocessable Entity',
+				content: {
+					'application/json': {
+						schema: {
+							$ref: '#/components/schemas/Error422_schema',
+							},
+						},
+					}
+				}
+
+			#swagger.responses[500] = {
+				description: 'Internal server error',
+				content: {
+					'application/json': {
+						schema: {
+							$ref: '#/components/schemas/Error500_schema',
+							},
+						},
+					}
+				}
+		*/
 		try {
 			const refresh_token = req.headers.authorization.split(' ')[1];
 			const isBlacklisted = await TokenBlacklist.findOne({ where: { jwt_token: refresh_token } });
@@ -201,9 +256,67 @@ class AuthController {
 		// #swagger.tags = ['Reg&Auth']
 		// #swagger.summary = 'Refresh of the access token end-point.'
 		/* 
-	        #swagger.description = 'This is the end-point for the refreshing of the access token of registered users in the system.'
-	    */
+			#swagger.description = 'This is the end-point for the refreshing of the access token of registered users in the system.'
+		*/
 		// #swagger.operationId = 'refresh'
+		// #swagger.security = [{"bearerAuth": []}]
+		/* 
+			#swagger.responses[200] = {
+		 	description: 'OK',
+			content: {
+				'application/json': {
+					schema: {
+						'type': 'object',
+						'required': ['message','token_access',],
+						'properties': {
+							'message': {
+								'type': 'string',
+								'format': 'string',
+								'example': 'Access token has been successfully refresh!',
+								'description': 'Message of the successful refresh of the access token response',
+							},
+							'token_access': {
+								'type': 'string',
+								'format': 'string',
+								'example': 'eyJhbGciOiJIUzI1NiIsInR...',
+								'description': 'Access token of the user',
+		 					},
+		 				},
+		 			},		
+		 		},
+			}
+		}
+		 	#swagger.responses[401] = {
+		 	description: 'Unauthorized. User is not authenticated',
+		 	content: {
+		 		'application/json': {
+		 			schema: {
+		 				$ref: '#/components/schemas/Error401_schema',
+		 			},
+		 		},
+		 	},
+		 }
+		 	#swagger.responses[422] = {
+		 	description: 'Unprocessable Entity',
+		 	content: {
+		 		'application/json': {
+		 			schema: {
+		 				$ref: '#/components/schemas/Error422_schema',
+		 			},
+		 		},
+		 	},
+		 }
+			#swagger.responses[500] = {
+		 	description: 'Internal server error',
+		 	content: {
+		 		'application/json': {
+		 			schema: {
+		 				$ref: '#/components/schemas/Error500_schema',
+		 			},
+		 		},
+		 	},
+		 }
+		*/
 		try {
 			const refresh_token = req.headers.authorization.split(' ')[1];
 			const isBlacklisted = await TokenBlacklist.findOne({ where: { jwt_token: refresh_token } });
@@ -244,12 +357,43 @@ class AuthController {
 	}
 
 	async profile(req, res) {
-		// #swagger.tags = ['Reg&Auth']
-		// #swagger.summary = 'User's profile end-point.'
-		/* 
-	        #swagger.description = ''
-	    */
-		// #swagger.operationId = 'profile'
+		// #swagger.tags = ['Reg&Auth'];
+		// #swagger.summary = 'User profile end-point.';
+		// #swagger.description = 'This is the end-point for the user profile of registered users in the system.';
+		// #swagger.operationId = 'profile';
+		// #swagger.security = [{ bearerAuth: [] }];
+		/* #swagger.responses[200] = {
+			description: 'OK',
+			content: {
+				'application/json': {
+					schema: {
+						$ref: '#/components/schemas/UserProfile_schema',
+						},
+					},
+				}
+			}
+			#swagger.responses[422] = {
+			description: 'Unprocessable Entity',
+			content: {
+				'application/json': {
+					schema: {
+						$ref: '#/components/schemas/Error422_schema',
+						},
+					},
+				}
+			}
+			#swagger.responses[500] = {
+			description: 'Internal server error',
+			content: {
+				'application/json': {
+					schema: {
+						$ref: '#/components/schemas/Error500_schema',
+						},
+					},
+				}
+			}
+		*/
+
 		try {
 			const token = req.headers.authorization.split(' ')[1];
 			const username = JWT.decode(token).username;

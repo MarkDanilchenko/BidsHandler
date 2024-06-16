@@ -44,17 +44,90 @@ const documentation = {
 				// bearerFormat: 'JWT',
 			},
 		},
-		schemas: {
-			ServerError_schema: {
-				$message: 'Internal server error',
-			},
-		},
-		examples: {
-			ServerError_example: {
-				value: {
-					message: 'Internal server error',
+		'@schemas': {
+			Error401_schema: {
+				type: 'object',
+				required: ['message'],
+				properties: {
+					message: {
+						type: 'string',
+						format: 'string',
+						example: 'Unauthorized. User is not authenticated',
+						description: 'Error message of the unauthorized response',
+					},
 				},
-				summary: 'The response message of the server error',
+			},
+			Error422_schema: {
+				type: 'object',
+				required: ['message'],
+				properties: {
+					message: {
+						type: 'string',
+						format: 'string',
+						example: 'Unprocessable Entity',
+						description: 'Error message of the unprocessable entity response',
+					},
+				},
+			},
+			Error500_schema: {
+				type: 'object',
+				required: ['message'],
+				properties: {
+					message: {
+						type: 'string',
+						format: 'string',
+						example: 'Internal server error',
+						description: 'Error message of the internal server error response',
+					},
+				},
+			},
+			UserProfile_schema: {
+				type: 'object',
+				required: ['username', 'email', 'first_name', 'last_name', 'avatar', 'created_at', 'role'],
+				properties: {
+					username: {
+						type: 'string',
+						format: 'string',
+						example: 'Ronald10',
+						description: 'Username in the system',
+					},
+					email: {
+						type: 'string',
+						format: 'string',
+						example: 'ronald123@example.com',
+						description: 'Users email',
+					},
+					first_name: {
+						type: 'string',
+						format: 'string',
+						example: 'Ronald',
+						description: 'Users First name',
+					},
+					last_name: {
+						type: 'string',
+						format: 'string',
+						example: 'Doe',
+						description: 'Users Last name',
+					},
+					avatar: {
+						type: 'string',
+						format: 'string',
+						example: '/avatar.png',
+						description: 'Users avatar',
+					},
+					created_at: {
+						type: 'string',
+						format: 'date-time',
+						example: '2021-01-01T00:00:00.000Z',
+						description: 'Users creation date',
+					},
+					role: {
+						type: 'string',
+						format: 'string',
+						example: 'user',
+						description: 'Users role',
+					},
+				},
 			},
 		},
 	},
