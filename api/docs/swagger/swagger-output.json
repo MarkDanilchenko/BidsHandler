@@ -17,8 +17,8 @@
       "description": "Registration & authentication end-points"
     },
     {
-      "name": "Users' requests",
-      "description": "Users' requests end-points"
+      "name": "Users requests",
+      "description": "Users requests end-points"
     },
     {
       "name": "Greeting",
@@ -468,6 +468,122 @@
           }
         ]
       }
+    },
+    "/requests": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users requests"
+        ],
+        "summary": "Create a new request by User end-point.",
+        "description": "This is the end-point for creating a new request by User.",
+        "operationId": "createRequest",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "Request created successfully!",
+                      "description": "Message of the successful creation of the request response"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403_schema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422_schema"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500_schema"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRequest_schema"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/requests/{id}": {
+      "put": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
     }
   },
   "components": {
@@ -489,6 +605,20 @@
             "format": "string",
             "examples": "Unauthorized. User is not authenticated",
             "description": "Error message of the unauthorized response"
+          }
+        }
+      },
+      "Error403_schema": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "format": "string",
+            "example": "Forbidden. Only users can create requests!",
+            "description": "Error message, because only users can create requests, not admins response"
           }
         }
       },
@@ -710,6 +840,20 @@
             "type": "string",
             "format": "binary",
             "description": "Users avatar"
+          }
+        }
+      },
+      "CreateRequest_schema": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "format": "string",
+            "example": "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptate est fugit inventore vero! Animi odio iure quasi doloremque! Odio ducimus quidem enim unde animi nostrum, ad inventore quia laboriosam beatae?",
+            "description": "Message of the users request response"
           }
         }
       }

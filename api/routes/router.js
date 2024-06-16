@@ -4,6 +4,7 @@ const { check, header, body, param, query } = require('express-validator');
 const dotenv = require('dotenv');
 dotenv.config({ path: '../../.env' });
 const AuthController = require('../controllers/controller_auth.js');
+const RequestController = require('../controllers/controller_request.js');
 const { routesDataValidation } = require('../middleware/routesData_validation.js');
 const { multer_config } = require('../middleware/multer_config.js');
 const { verifyToken } = require('../middleware/jwt_verification.js');
@@ -61,7 +62,7 @@ router.route('/signup').post(
 				return true;
 			}
 		}),
-		check('password', 'Password must be at least 8 characters and contain at least one number and one letter!').custom((value) => {
+		body('password', 'Password must be at least 8 characters and contain at least one number and one letter!').custom((value) => {
 			return value.match(/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,}$/gi);
 		}),
 	],
@@ -86,6 +87,21 @@ router
 router
 	.route('/profile')
 	.get(header('Authorization', 'Bearer access token should be provided!').exists(), routesDataValidation, verifyToken, AuthController.profile);
+
+// http://127.0.0.1:3000/api/v1/requests - POST_A_REQUEST_ROUTE (FOR USER), GET_ALL_REQUESTS_ROUTE (FOR ADMIN)
+router
+	.route('/requests')
+	.get()
+	.post(
+		header('Authorization', 'Bearer access token should be provided!').exists(),
+		body('request_message').exists(),
+		routesDataValidation,
+		verifyToken,
+		RequestController.createRequest
+	);
+
+// http://127.0.0.1:3000/api/v1/requests - PUT_A_REQUEST_ROUTE (FOR ADMIN), DELETE_A_REQUEST_ROUTE (FOR ADMIN)
+router.route('/requests/:id').put().delete();
 
 // http://127.0.0.1:3000/api/v1/* - NOT_FOUND
 router.route('*').get(async (req, res) => {

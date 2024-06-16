@@ -28,8 +28,8 @@ const documentation = {
 			description: 'Registration & authentication end-points',
 		},
 		{
-			name: "Users' requests",
-			description: "Users' requests end-points",
+			name: 'Users requests',
+			description: 'Users requests end-points',
 		},
 		{
 			name: 'Greeting',
@@ -56,6 +56,18 @@ const documentation = {
 						description: 'Error message of the unauthorized response',
 					},
 				},
+			},
+			Error403_schema: {
+				type: 'object',
+				required: ['message'],
+				properties: {
+					message: {
+						type: 'string',
+						format: 'string',
+						example: 'Forbidden. Only users can create requests!',
+						description: 'Error message, because only users can create requests, not admins response',
+					},
+				}
 			},
 			Error413_schema: {
 				type: 'object',
@@ -246,6 +258,19 @@ const documentation = {
 						type: 'string',
 						format: 'binary',
 						description: 'Users avatar',
+					},
+				},
+			},
+			CreateRequest_schema: {
+				type: 'object',
+				required: ['message'],
+				properties: {
+					message: {
+						type: 'string',
+						format: 'string',
+						example:
+							'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptate est fugit inventore vero! Animi odio iure quasi doloremque! Odio ducimus quidem enim unde animi nostrum, ad inventore quia laboriosam beatae?',
+						description: 'Message of the users request response',
 					},
 				},
 			},
