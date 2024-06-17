@@ -76,31 +76,29 @@ router.route('/signin').post([body('password', 'Password is required.').exists()
 // http://127.0.0.1:3000/api/v1/signout - SIGNOUT_ROUTE
 router
 	.route('/signout')
-	.get(header('Authorization', 'Bearer refresh token should be provided!').exists(), routesDataValidation, verifyToken, AuthController.signout);
+	.get([header('Authorization', 'Bearer refresh token should be provided!').exists()], routesDataValidation, verifyToken, AuthController.signout);
 
 // http://127.0.0.1:3000/api/v1/refresh - REFRESH_ROUTE
 router
 	.route('/refresh')
-	.get(header('Authorization', 'Bearer refresh token should be provided!').exists(), routesDataValidation, verifyToken, AuthController.refresh);
+	.get([header('Authorization', 'Bearer refresh token should be provided!').exists()], routesDataValidation, verifyToken, AuthController.refresh);
 
 // http://127.0.0.1:3000/api/v1/profile - PROFILE_ROUTE
 router
 	.route('/profile')
-	.get(header('Authorization', 'Bearer access token should be provided!').exists(), routesDataValidation, verifyToken, AuthController.profile);
+	.get([header('Authorization', 'Bearer access token should be provided!').exists()], routesDataValidation, verifyToken, AuthController.profile);
 
 // http://127.0.0.1:3000/api/v1/requests - POST_A_REQUEST_ROUTE (FOR USER), GET_ALL_REQUESTS_ROUTE (FOR ADMIN)
 router
 	.route('/requests')
 	.get(
-		header('Authorization', 'Bearer access token should be provided!').exists(),
-		body('request_status').exists().isIn(['active', 'resolved']),
+		[header('Authorization', 'Bearer access token should be provided!').exists(), body('request_status').exists().isIn(['active', 'resolved'])],
 		routesDataValidation,
 		verifyToken,
 		RequestController.getRequests
 	)
 	.post(
-		header('Authorization', 'Bearer access token should be provided!').exists(),
-		body('request_message').exists(),
+		[header('Authorization', 'Bearer access token should be provided!').exists(), body('request_message').exists()],
 		routesDataValidation,
 		verifyToken,
 		RequestController.createRequest
@@ -110,7 +108,12 @@ router
 router
 	.route('/requests/:id')
 	.put(header('Authorization', 'Bearer access token should be provided!').exists())
-	.delete(header('Authorization', 'Bearer access token should be provided!').exists());
+	.delete(
+		[header('Authorization', 'Bearer access token should be provided!').exists(), param('id').exists().isInt({ min: 1 })],
+		routesDataValidation,
+		verifyToken,
+		RequestController.deleteRequest
+	);
 
 // http://127.0.0.1:3000/api/v1/* - NOT_FOUND
 router.route('*').get(async (req, res) => {

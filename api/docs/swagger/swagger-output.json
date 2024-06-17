@@ -486,18 +486,10 @@
             }
           },
           {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/PageInQuery_schema"
           },
           {
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/LimitInQuery_schema"
           }
         ],
         "responses": {
@@ -667,22 +659,96 @@
         }
       },
       "delete": {
-        "description": "",
+        "tags": [
+          "Users requests"
+        ],
+        "summary": "Delete request by admin end-point.",
+        "description": "This is the end-point for deleting requests by admins.",
+        "operationId": "deleteRequest",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
+            "$ref": "#/components/parameters/IDInPath_schema"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "schema": {
               "type": "string"
             }
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "Request with ID: ${request_id} was deleted successfully!",
+                      "description": "Success message of the deleted request response"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403_schema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422_schema"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500_schema"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     }
   },
@@ -691,6 +757,41 @@
       "bearerAuth_schema": {
         "type": "http",
         "scheme": "bearer"
+      }
+    },
+    "parameters": {
+      "IDInPath_schema": {
+        "in": "path",
+        "name": "id",
+        "description": "Request id",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "format": "integer",
+          "example": 1
+        }
+      },
+      "PageInQuery_schema": {
+        "in": "query",
+        "name": "page",
+        "description": "Page number",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "integer",
+          "example": 1
+        }
+      },
+      "LimitInQuery_schema": {
+        "in": "query",
+        "name": "limit",
+        "description": "Limit of items per page",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "integer",
+          "example": 10
+        }
       }
     },
     "schemas": {
@@ -959,15 +1060,6 @@
       },
       "GetRequests_schema": {
         "type": "object",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "page",
-            "description": "Page number",
-            "required": false,
-            "type": "integer"
-          }
-        ],
         "required": [
           "request_status"
         ],

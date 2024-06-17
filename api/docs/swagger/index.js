@@ -2,6 +2,7 @@
 const path = require('path');
 const swaggerAutogen = require('swagger-autogen')({ openapi: '3.0.0' });
 const dotenv = require('dotenv');
+const { type } = require('os');
 dotenv.config({ path: '../../../.env' });
 // const swaggerConverter = require('swagger2openapi');
 
@@ -276,15 +277,6 @@ const documentation = {
 			},
 			GetRequests_schema: {
 				type: 'object',
-				parameters: [
-					{
-						in: 'query',
-						name: 'page',
-						description: 'Page number',
-						required: false,
-						type: 'integer',
-					},
-				],
 				required: ['request_status'],
 				properties: {
 					request_status: {
@@ -406,6 +398,41 @@ const documentation = {
 					pageInfo: {
 						$ref: '#/components/schemas/PageInfo_schema',
 					},
+				},
+			},
+		},
+		parameters: {
+			IDInPath_schema: {
+				in: 'path',
+				name: 'id',
+				description: 'Request id',
+				required: true,
+				schema: {
+					type: 'integer',
+					format: 'integer',
+					example: 1,
+				},
+			},
+			PageInQuery_schema: {
+				in: 'query',
+				name: 'page',
+				description: 'Page number',
+				required: false,
+				schema: {
+					type: 'integer',
+					format: 'integer',
+					example: 1,
+				},
+			},
+			LimitInQuery_schema: {
+				in: 'query',
+				name: 'limit',
+				description: 'Limit of items per page',
+				required: false,
+				schema: {
+					type: 'integer',
+					format: 'integer',
+					example: 10,
 				},
 			},
 		},
