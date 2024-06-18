@@ -11,10 +11,12 @@ Technologies used:
   - PostgresQL (Sequelize);
   - Insomnia <span style="font-size: smaller">(for testing and documenting API);</span>
   - OpenAPI (swagger) <span style="font-size: smaller">(for documenting API);</span>
-  - Docker + Compose.
+  - Docker + Compose <span style="color: red">(in progress)</span>.
 
 ---
 <br>
+
+#### App installation via Docker is in progress (this section does not work now)
 
 1. Clone repository/archive to your **local folder**;
 2. Open Terminal and make sure You are in **local folder**:
@@ -67,15 +69,11 @@ Technologies used:
 
 ## API Endpoints &#128196;
 
-1. **Test URL**:
-
-    <span style="font-size: smaller">request:</span> ->
+1. **Greeting page URL**:
 
     ```
-    http://0.0.0.0:3000/
+    http://0.0.0.0:3001/  OR  http://0.0.0.0:3001/api/v1/
     ```
-
-    <span style="font-size: smaller">response (json):</span> ->
 
     <div align="center">
     <img src="./screenshots/ScrShot_1.png" width="75%" height="75%" alt='Greeting page of the API.'>
@@ -85,17 +83,21 @@ Technologies used:
 
     2.1. **Insomnia API documentation**
 
-    > For browsing Insomnia API documentation change directory to the /api_documentation/insomnia and run insomnia client server:
+    For browsing Insomnia API documentation change directory to the **./api/docs/insomnia** in Your project folder and run insomnia client server:
 
     ```
-    cd api_documentation/insomnia && npx serve
+    npx serve
     ```
 
     p.s.: <span style="font-size: 12px">*press **Y** if any packages are required.*</span>
 
     2.2. **OpenAPI3 documentation**:
 
-    > OpenAPI (Swagger) documentation are also available in .yaml format in api_documentation/openapi.
+    OpenAPI3 (Swagger) documentation are also available with URL:
+
+    ```
+    http://0.0.0.0:3001/api/v1/docs
+    ```
 
 <br>
 
