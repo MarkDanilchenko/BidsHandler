@@ -18,6 +18,7 @@ const sequelize = new Sequelize(name_db, user_db, pass_db, {
 		acquire: 30000,
 		idle: 10000,
 	},
+	logging: false,
 });
 
 // --------------------------------------EXPORT

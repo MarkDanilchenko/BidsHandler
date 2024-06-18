@@ -641,20 +641,128 @@
     },
     "/requests/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Users requests"
+        ],
+        "summary": "Resolve request by admin end-point.",
+        "description": "This is the end-point for resolving requests by admins.",
+        "operationId": "resolveRequest",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
+            "$ref": "#/components/parameters/IDInPath_schema"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "schema": {
               "type": "string"
             }
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "Request with ID: ___ was resolved successfully! Email reply was sent to user email.",
+                      "description": "Success message of resolved request"
+                    },
+                    "email_reply": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "https://ethereal.email/message/Z...",
+                      "description": "Link to successful email reply to the user response. Here is used Ethereal email service for testing purposes."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403_schema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "Request with ID: ___ not found or doesn't exist.",
+                      "description": "Error message of not found request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422_schema"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500_schema"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "comment"
+                ],
+                "properties": {
+                  "comment": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Admin's resolution comment: ...",
+                    "description": "Admin's comment of the resolved request"
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -718,7 +826,14 @@
                   "required": [
                     "message"
                   ],
-                  "properties": {}
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "Request with ID: ___ not found or doesn't exist.",
+                      "description": "Error message of the not found response"
+                    }
+                  }
                 }
               }
             }

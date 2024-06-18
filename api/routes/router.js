@@ -107,7 +107,13 @@ router
 // http://127.0.0.1:3000/api/v1/requests - PUT_A_REQUEST_ROUTE (FOR ADMIN), DELETE_A_REQUEST_ROUTE (FOR ADMIN)
 router
 	.route('/requests/:id')
-	.put(header('Authorization', 'Bearer access token should be provided!').exists())
+	.put(
+		header('Authorization', 'Bearer access token should be provided!').exists(),
+		param('id').exists().isInt({ min: 1 }),
+		routesDataValidation,
+		verifyToken,
+		RequestController.resolveRequest
+	)
 	.delete(
 		[header('Authorization', 'Bearer access token should be provided!').exists(), param('id').exists().isInt({ min: 1 })],
 		routesDataValidation,
