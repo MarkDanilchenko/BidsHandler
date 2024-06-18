@@ -8,6 +8,7 @@ const pass_db = process.env.DB_PASSWORD;
 const sequelize = new Sequelize(name_db, user_db, pass_db, {
 	dialect: 'postgres',
 	host: process.env.DB_HOST || '127.0.0.1',
+	// Database inner port = 5432 by default and must be changed anyway.
 	port: 5432,
 	define: {
 		timestamps: false,

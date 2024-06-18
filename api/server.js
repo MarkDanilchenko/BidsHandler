@@ -31,10 +31,6 @@ server.use(`/api/v1/docs`, swaggerUI.serve, swaggerUI.setup(swaggerDocumentation
 // --------------------------------------COMMON_MIDDLEWARE
 server.use(express.json());
 server.use(express.urlencoded({ extended: false }));
-// server.use((req, res, next) => {
-// 	res.setHeader('Content-Type', 'multipart/form-data');
-// 	next();
-// });
 server.use('/api/v1', express.static(`${__dirname}/node_modules`));
 server.use('/api/v1', express.static(`${__dirname}/assets`));
 
@@ -53,6 +49,7 @@ server.all('*', async (req, res) => {
 		message: 'Resource Not found. Please, check the URL and try again.',
 	});
 	res.end();
+	return;
 });
 
 // --------------------------------------EXPORT

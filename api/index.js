@@ -9,27 +9,20 @@ const { sequelize } = require('./models/db_orm.js');
 // --------------------------------------START SERVER+DB
 (async () => {
 	try {
-		await sequelize
-			.sync({ force: false })
-			.then(() => {
-				console.log(`PostgresQL connected!`);
-				server.listen(port_server, host_server, () => {
-					if (process.env.SERVER_PORT_OUTER) {
-						console.log(`Server started on host:port - ${host_server}:${process.env.SERVER_PORT_OUTER}`);
-					} else {
-						console.log(`Server started on host:port - ${host_server}:${port_server}`);
-					}
-				});
-			})
-			.catch((error) => {
-				console.log(error);
-                sequelize.close();
-                process.exit(0);
+		await sequelize.sync({ force: false }).then(() => {
+			console.log(`PostgresQL connected!`);
+			server.listen(port_server, host_server, () => {
+				if (process.env.SERVER_PORT_OUTER) {
+					console.log(`Server started on host:port - ${host_server}:${process.env.SERVER_PORT_OUTER}`);
+				} else {
+					console.log(`Server started on host:port - ${host_server}:${port_server}`);
+				}
 			});
+		});
 	} catch (error) {
-		console.log(error);
-        await sequelize.close();
-        process.exit(0);
+		console.log(`Error: ${error.message}`);
+		await sequelize.close();
+		process.exit(0);
 	}
 })();
 

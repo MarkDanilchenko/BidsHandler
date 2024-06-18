@@ -495,10 +495,10 @@ class AuthController {
 		*/
 		try {
 			const refresh_token = req.headers.authorization.split(' ')[1];
-			const isBlacklisted = await TokenBlacklist.findOne({ where: { jwt_token: refresh_token } });
-			if (isBlacklisted) {
-				throw new Error('Invalid refresh token. User is not signed in.');
-			} else {
+			await TokenBlacklist.findOne({ where: { jwt_token: refresh_token } }).then((result) => {
+				if (result) {
+					throw new Error('Invalid refresh token. User is not signed in.');
+				}
 				const token_access = JWT.sign(
 					{ username: JWT.decode(refresh_token).username, email: JWT.decode(refresh_token).email, role: JWT.decode(refresh_token).role },
 					jwt_config.jwt_secretKey,
@@ -513,7 +513,7 @@ class AuthController {
 				});
 				res.end();
 				return;
-			}
+			});
 		} catch (error) {
 			if (error.message === 'Invalid refresh token. User is not signed in.') {
 				res.status(401);

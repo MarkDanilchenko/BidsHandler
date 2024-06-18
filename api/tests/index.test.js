@@ -71,8 +71,5 @@ describe('API docs routes', () => {
 	});
 });
 
-describe('API auth routes', () => {
-	it('User\'s successful registration with POST method on "http://127.0.0.1:3000/api/v1/signup"', (done) => {
-		done();
-	});
-});
+describe('API auth routes', () => {});
+describe('API request routes', () => {});

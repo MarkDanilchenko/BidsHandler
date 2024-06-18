@@ -14,10 +14,7 @@ const { verifyToken } = require('../middleware/jwt_verification.js');
 router.route('/').get(async (req, res) => {
 	// #swagger.tags = ['Greeting']
 	// #swagger.summary = 'Greeting HTML-page end-point.'
-	/* 
-	#swagger.description = 'This is a base greeting HTML-page of the API,
-	where you can learn more about it purpose and get links to the documentation and source code on GitHub.com'
-	*/
+	// #swagger.description = 'This is a base greeting HTML-page of the API, where you can learn more about it purpose and get links to the documentation and source code on GitHub.com.'
 	// #swagger.operationId = 'greeting'
 	/*
 	#swagger.responses[200] = {
@@ -65,6 +62,13 @@ router.route('/signup').post(
 		body('password', 'Password must be at least 8 characters and contain at least one number and one letter!').custom((value) => {
 			return value.match(/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,}$/gi);
 		}),
+		body('role', 'Optional. Allowed roles: "user" and "admin".').custom((value) => {
+			if (value) {
+				return value === 'user' || value === 'admin';
+			} else {
+				return true;
+			}
+		}),
 	],
 	routesDataValidation,
 	AuthController.signup
@@ -98,7 +102,10 @@ router
 		RequestController.getRequests
 	)
 	.post(
-		[header('Authorization', 'Bearer access token should be provided!').exists(), body('request_message').exists()],
+		[
+			header('Authorization', 'Bearer access token should be provided!').exists(),
+			body('request_message').exists().isLength({ min: 1, max: 1000 }),
+		],
 		routesDataValidation,
 		verifyToken,
 		RequestController.createRequest
@@ -128,6 +135,7 @@ router.route('*').get(async (req, res) => {
 		message: 'Resource Not found. Please, check the URL and try again.',
 	});
 	res.end();
+	return;
 });
 
 // --------------------------------------EXPORT

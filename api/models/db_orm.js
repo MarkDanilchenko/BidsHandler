@@ -91,13 +91,6 @@ const UserRequest = sequelize.define('user_request', {
 		allowNull: true,
 		unique: false,
 		defaultValue: null,
-		validate: {
-			checkStatus: (value) => {
-				if (this.status === 'resolved' && !value) {
-					throw new Error('Comment is required when status is "resolved"');
-				}
-			},
-		},
 	},
 	created_at: {
 		type: Sequelize.DATE,

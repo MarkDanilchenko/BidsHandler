@@ -32,7 +32,7 @@
           "Greeting"
         ],
         "summary": "Greeting HTML-page end-point.",
-        "description": "This is a base greeting HTML-page of the API, \twhere you can learn more about it purpose and get links to the documentation and source code on GitHub.com",
+        "description": "This is a base greeting HTML-page of the API, where you can learn more about it purpose and get links to the documentation and source code on GitHub.com.",
         "operationId": "greeting",
         "responses": {
           "200": {
