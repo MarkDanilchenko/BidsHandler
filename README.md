@@ -89,4 +89,28 @@ Technologies used:
 
 <br>
 
+p.s.
+
+Two users are already defined in database for testing API. Create a new one or use default for signIn in the system:
+
+1. Role: "**user**"
+
+```
+{
+    "username": "User1000"
+    "email": "user123@example.com",
+    "password": "qwerty123"
+}
+```
+
+2. Role: "**admin**"
+
+```
+{
+    "username": "Admin"
+    "email": "admin123@example.com",
+    "password": "qwerty123"
+}
+```
+
 ---
