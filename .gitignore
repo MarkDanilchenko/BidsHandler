@@ -9,6 +9,7 @@ staticfiles/
 mediafiles/
 *.pdf
 *.sql
+!dump.sql
 db_data/
 .DS_Store
 package-lock.*

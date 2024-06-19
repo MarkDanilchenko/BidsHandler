@@ -10,7 +10,6 @@ const routesDataValidation = (req, res, next) => {
 		res.status(422);
 		res.json({ message: errors.array() });
 		res.end();
-		return;
 	} else {
 		next();
 	}

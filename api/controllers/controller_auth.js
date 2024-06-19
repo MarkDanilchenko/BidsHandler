@@ -13,9 +13,7 @@ class AuthController {
 	async signup(req, res) {
 		// #swagger.tags = ['Reg&Auth']
 		// #swagger.summary = 'Sign up end-point.'
-		/* 
-			#swagger.description = 'This is the end-point for the registration of new users in the system. Both users and admins can use it.'
-		*/
+		// #swagger.description = 'This is the end-point for the registration new users in the system. Both users and admins can use it.'
 		// #swagger.operationId = 'signup'
 		/*
 			#swagger.requestBody = {
@@ -23,7 +21,7 @@ class AuthController {
 				content: {
 					'multipart/form-data': {
 						schema: {
-							$ref: '#/components/schemas/SignUp_schema'
+							$ref: '#/components/schemas/SignUp_requestSchema'
 						}
 					}
 				}
@@ -41,8 +39,8 @@ class AuthController {
 								message: {
 									type: 'string',
 									format: 'string',
-									examples: 'User signed up successfully!',
-									description: 'Message of the successful signup of the user response',
+									example: 'User signed up successfully!',
+									description: 'Message of the successful signup.',
 								}
 							}
 						}
@@ -60,8 +58,8 @@ class AuthController {
 								message: {
 									type: 'string',
 									format: 'string',
-									examples: 'Invalid role. Should be "user" or "admin".',
-									description: 'Error message of the bad request response',
+									example: 'Invalid role. Should be "user" or "admin".',
+									description: 'Error message of the bad request according to the role.',
 								}
 							}
 						}
@@ -73,7 +71,7 @@ class AuthController {
 				content: {
 					'application/json': {
 						schema: {
-							$ref: '#/components/schemas/Error413_schema'
+							$ref: '#/components/schemas/Error413_responseSchema'
 						}
 					}
 				}
@@ -83,7 +81,7 @@ class AuthController {
 				content: {
 					'application/json': {
 						schema: {
-							$ref: '#/components/schemas/Error415_schema'
+							$ref: '#/components/schemas/Error415_responseSchema'
 						}
 					}
 				}
@@ -93,7 +91,7 @@ class AuthController {
 				content: {
 					'application/json': {
 						schema: {
-							$ref: '#/components/schemas/Error422_schema'
+							$ref: '#/components/schemas/Error422_responseSchema'
 						}
 					}
 				}
@@ -103,7 +101,7 @@ class AuthController {
 				content: {
 					'application/json': {
 						schema: {
-							$ref: '#/components/schemas/Error500_schema'
+							$ref: '#/components/schemas/Error500_responseSchema'
 						}
 					}
 				}
@@ -178,9 +176,7 @@ class AuthController {
 	async signin(req, res) {
 		// #swagger.tags = ['Reg&Auth']
 		// #swagger.summary = 'Sign in end-point.'
-		/* 
-			#swagger.description = 'This is the end-point for the signing in of registered users in the system.'
-		*/
+		// #swagger.description = 'This is the end-point to signin in the system.'
 		// #swagger.operationId = 'signin'
 		/*
 		   #swagger.requestBody = {
@@ -190,10 +186,10 @@ class AuthController {
 					   schema: {
 						oneOf: [
 							{
-								$ref: '#/components/schemas/SignInWithEmail_schema'
+								$ref: '#/components/schemas/SignInWithEmail_requestSchema'
 							},
 							{
-								$ref: '#/components/schemas/SignInWithUsername_schema'
+								$ref: '#/components/schemas/SignInWithUsername_requestSchema'
 							}
 						]
 					   	}
@@ -214,19 +210,19 @@ class AuthController {
 									type: 'string',
 									format: 'string',
 									example: 'User signed in successfully!',
-									description: 'Message of the successful sign in response',
+									description: 'Message of the successful sign in.',
 								},
 								token_access: {
 									type: 'string',
 									format: 'string',
 									example: 'eyJhbGciOiJIUzI1NiIsInR...',
-									description: 'Access token for the signed in user',
+									description: 'Access token for the signed in user.',
 								},
 								token_refresh: {
 									type: 'string',
 									format: 'string',
 									example: 'eyJhbGciOjJIUzI1NiIsInR...',
-									description: 'Refresh token for the signed in user',
+									description: 'Refresh token for the signed in user.',
 								}
 							}
 						}
@@ -238,7 +234,7 @@ class AuthController {
 				content: {
 					'application/json': {
 						schema: {
-							$ref: '#/components/schemas/Error401_schema'
+							$ref: '#/components/schemas/Error401_responseSchema'
 						}
 					}
 				}
@@ -248,7 +244,7 @@ class AuthController {
 				content: {
 					'application/json': {
 						schema: {
-							$ref: '#/components/schemas/Error422_schema'
+							$ref: '#/components/schemas/Error422_responseSchema'
 						}
 					}
 				}
@@ -258,7 +254,7 @@ class AuthController {
 				content: {
 					'application/json': {
 						schema: {
-							$ref: '#/components/schemas/Error500_schema'
+							$ref: '#/components/schemas/Error500_responseSchema'
 						}
 					}
 				}
@@ -273,10 +269,12 @@ class AuthController {
 			}
 			const isRegisteredUser = await User.findOne({
 				where: { [Op.or]: [{ email: email }, { username: username }] },
+			}).then((result) => {
+				if (!result) {
+					throw new Error('User is not registered.');
+				}
+				return result;
 			});
-			if (!isRegisteredUser) {
-				throw new Error('User is not registered.');
-			}
 			const isPasswordCorrect = bcryptjs.compareSync(password, isRegisteredUser.password);
 			if (!isPasswordCorrect) {
 				throw new Error('Wrong password.');
@@ -288,16 +286,17 @@ class AuthController {
 					expiresIn: jwt_config.jwt_expiresInAccess,
 				}
 			);
-			// Generate a refresh token and check if the token is already blacklisted.
+			// Generate a refresh token and check if the token is already blacklisted or not.
+			// If it is not, send the response with both access and refresh tokens.
+			// If it is, generate a new one and check again.
 			while (true) {
 				const token_refresh = JWT.sign(
 					{ username: isRegisteredUser.username, email: isRegisteredUser.email, role: isRegisteredUser.user_role_id },
 					jwt_config.jwt_secretKey,
 					{ expiresIn: jwt_config.jwt_expiresInRefresh }
 				);
-				const isRefreshTokenBlacklisted = await TokenBlacklist.findOne({ where: { jwt_token: token_refresh } });
-				// If the token is not blacklisted, send the response with both access and refresh tokens.
-				if (!isRefreshTokenBlacklisted) {
+				const isTokenBlacklisted = await TokenBlacklist.findOne({ where: { jwt_token: token_refresh } });
+				if (!isTokenBlacklisted) {
 					res.status(200);
 					res.json({
 						message: `User: ${isRegisteredUser.username} signed in successfully!`,
@@ -306,10 +305,8 @@ class AuthController {
 					});
 					res.end();
 					return;
-				} else {
-					// If the token is blacklisted, generate a new one and check again.
-					continue;
 				}
+				continue;
 			}
 		} catch (error) {
 			if (
@@ -337,9 +334,7 @@ class AuthController {
 	async signout(req, res) {
 		// #swagger.tags = ['Reg&Auth']
 		// #swagger.summary = 'Sign out end-point.'
-		/* 
-			#swagger.description = 'This is the end-point for the signing out of registered users in the system and blacklisting their refresh tokens permanently.'
-		*/
+		// #swagger.description = 'This is the end-point to sign out in the system and blacklist their refresh tokens permanently.'
 		// #swagger.operationId = 'signout'
 		// #swagger.security = [{"bearerAuth": []}]
 		/*
@@ -355,42 +350,39 @@ class AuthController {
 									type: 'string',
 									format: 'string',
 									example: 'User signed out successfully!',
-									description: 'Message of the successful sign out response',
+									description: 'Message of the successful sign out.',
 								}
 							}
 						}
 					}
 				}
 			}
-
 			#swagger.responses[401] = {
 				description: 'Unauthorized',
 				content: {
 					'application/json': {
 						schema: {
-							$ref: '#/components/schemas/Error401_schema',
+							$ref: '#/components/schemas/Error401_responseSchema',
 							},
 						},
 					}
 				}
-
 			#swagger.responses[422] = {
 				description: 'Unprocessable Entity',
 				content: {
 					'application/json': {
 						schema: {
-							$ref: '#/components/schemas/Error422_schema',
+							$ref: '#/components/schemas/Error422_responseSchema',
 							},
 						},
 					}
 				}
-
 			#swagger.responses[500] = {
 				description: 'Internal server error',
 				content: {
 					'application/json': {
 						schema: {
-							$ref: '#/components/schemas/Error500_schema',
+							$ref: '#/components/schemas/Error500_responseSchema',
 							},
 						},
 					}
@@ -398,10 +390,11 @@ class AuthController {
 		*/
 		try {
 			const refresh_token = req.headers.authorization.split(' ')[1];
-			const isBlacklisted = await TokenBlacklist.findOne({ where: { jwt_token: refresh_token } });
-			if (isBlacklisted) {
-				throw new Error('User is already signed out.');
-			}
+			await TokenBlacklist.findOne({ where: { jwt_token: refresh_token } }).then((result) => {
+				if (result) {
+					throw new Error('User is already signed out.');
+				}
+			});
 			await TokenBlacklist.create({ jwt_token: refresh_token }).then(() => {
 				res.status(200);
 				res.json({
@@ -431,9 +424,7 @@ class AuthController {
 	async refresh(req, res) {
 		// #swagger.tags = ['Reg&Auth']
 		// #swagger.summary = 'Refresh of the access token end-point.'
-		/* 
-			#swagger.description = 'This is the end-point for the refreshing of the access token of registered users in the system.'
-		*/
+		// #swagger.description = 'This is the end-point for the refreshing access token.'
 		// #swagger.operationId = 'refresh'
 		// #swagger.security = [{"bearerAuth": []}]
 		/* 
@@ -449,13 +440,13 @@ class AuthController {
 								'type': 'string',
 								'format': 'string',
 								'example': 'Access token has been successfully refresh!',
-								'description': 'Message of the successful refresh of the access token response',
+								'description': 'Message of the successful refresh of the access token.',
 							},
 							'token_access': {
 								'type': 'string',
 								'format': 'string',
 								'example': 'eyJhbGciOiJIUzI1NiIsInR...',
-								'description': 'Access token of the user',
+								'description': 'Access token.',
 		 					},
 		 				},
 		 			},		
@@ -467,7 +458,7 @@ class AuthController {
 		 	content: {
 		 		'application/json': {
 		 			schema: {
-		 				$ref: '#/components/schemas/Error401_schema',
+		 				$ref: '#/components/schemas/Error401_responseSchema',
 		 			},
 		 		},
 		 	},
@@ -477,7 +468,7 @@ class AuthController {
 		 	content: {
 		 		'application/json': {
 		 			schema: {
-		 				$ref: '#/components/schemas/Error422_schema',
+		 				$ref: '#/components/schemas/Error422_responseSchema',
 		 			},
 		 		},
 		 	},
@@ -487,7 +478,7 @@ class AuthController {
 		 	content: {
 		 		'application/json': {
 		 			schema: {
-		 				$ref: '#/components/schemas/Error500_schema',
+		 				$ref: '#/components/schemas/Error500_responseSchema',
 		 			},
 		 		},
 		 	},
@@ -495,25 +486,32 @@ class AuthController {
 		*/
 		try {
 			const refresh_token = req.headers.authorization.split(' ')[1];
-			await TokenBlacklist.findOne({ where: { jwt_token: refresh_token } }).then((result) => {
-				if (result) {
-					throw new Error('Invalid refresh token. User is not signed in.');
-				}
-				const token_access = JWT.sign(
-					{ username: JWT.decode(refresh_token).username, email: JWT.decode(refresh_token).email, role: JWT.decode(refresh_token).role },
-					jwt_config.jwt_secretKey,
-					{
-						expiresIn: jwt_config.jwt_expiresInAccess,
+			await TokenBlacklist.findOne({ where: { jwt_token: refresh_token } })
+				.then((result) => {
+					if (result) {
+						throw new Error('Invalid refresh token. User is not signed in.');
 					}
-				);
-				res.status(200);
-				res.json({
-					message: 'Access token refreshed successfully!',
-					token_access: token_access,
+				})
+				.then(() => {
+					const token_access = JWT.sign(
+						{
+							username: JWT.decode(refresh_token).username,
+							email: JWT.decode(refresh_token).email,
+							role: JWT.decode(refresh_token).role,
+						},
+						jwt_config.jwt_secretKey,
+						{
+							expiresIn: jwt_config.jwt_expiresInAccess,
+						}
+					);
+					res.status(200);
+					res.json({
+						message: 'Access token refreshed successfully!',
+						token_access: token_access,
+					});
+					res.end();
+					return;
 				});
-				res.end();
-				return;
-			});
 		} catch (error) {
 			if (error.message === 'Invalid refresh token. User is not signed in.') {
 				res.status(401);
@@ -535,7 +533,7 @@ class AuthController {
 	async profile(req, res) {
 		// #swagger.tags = ['Reg&Auth'];
 		// #swagger.summary = 'User profile end-point.';
-		// #swagger.description = 'This is the end-point for the user profile of registered users in the system.';
+		// #swagger.description = 'This is the end-point for browsing users profile in the system.';
 		// #swagger.operationId = 'profile';
 		// #swagger.security = [{ bearerAuth: [] }];
 		/* #swagger.responses[200] = {
@@ -543,7 +541,7 @@ class AuthController {
 			content: {
 				'application/json': {
 					schema: {
-						$ref: '#/components/schemas/UserProfile_schema',
+						$ref: '#/components/schemas/UserProfile_responseSchema',
 						},
 					},
 				}
@@ -553,7 +551,7 @@ class AuthController {
 			content: {
 				'application/json': {
 					schema: {
-						$ref: '#/components/schemas/Error422_schema',
+						$ref: '#/components/schemas/Error422_responseSchema',
 						},
 					},
 				}
@@ -563,7 +561,7 @@ class AuthController {
 			content: {
 				'application/json': {
 					schema: {
-						$ref: '#/components/schemas/Error500_schema',
+						$ref: '#/components/schemas/Error500_responseSchema',
 						},
 					},
 				}
@@ -572,11 +570,9 @@ class AuthController {
 
 		try {
 			const token = req.headers.authorization.split(' ')[1];
-			const username = JWT.decode(token).username;
-			const email = JWT.decode(token).email;
 			await User.findAll({
 				where: {
-					[Op.and]: [{ username: username }, { email: email }],
+					[Op.and]: [{ username: JWT.decode(token).username }, { email: JWT.decode(token).email }],
 				},
 				include: [
 					{

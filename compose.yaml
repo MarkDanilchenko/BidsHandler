@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+    # ------------------------------------------------------api(expressjs)
+    api:
+        restart: always
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: api
+        command: >
+            sh -c "npm run dev"
+        ports:
+            - ${SERVER_PORT_OUTER}:3000
+        expose:
+            - 3000
+        networks:
+            - backend
+        links:
+            - db
+        depends_on:
+            db:
+                condition: service_healthy
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://${SERVER_HOST}:3000/api/v1/']
+            timeout: 5s
+            interval: 10s
+            retries: 3
+
+    # ------------------------------------------------------db(postgresQL)
+    db:
+        restart: always
+        image: postgres:14-alpine
+        container_name: db
+        env_file:
+            - .env
+        ports:
+            - ${DB_PORT_OUTER}:5432
+        expose:
+            - 5432
+        networks:
+            - backend
+        volumes:
+            - ./db_data:/var/lib/postgresql/data
+            - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
+        healthcheck:
+            test: ['CMD', 'pg_isready', '-U', '${DB_USERNAME}', '-d', '${DB_NAME}']
+            timeout: 5s
+            interval: 10s
+            retries: 3
+    # ------------------------------------------------------other(volumes && networks)
+volumes:
+    db_data:
+
+networks:
+    backend:

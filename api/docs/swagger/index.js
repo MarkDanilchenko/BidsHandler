@@ -2,7 +2,6 @@
 const path = require('path');
 const swaggerAutogen = require('swagger-autogen')({ openapi: '3.0.0' });
 const dotenv = require('dotenv');
-const { type } = require('os');
 dotenv.config({ path: '../../../.env' });
 // const swaggerConverter = require('swagger2openapi');
 
@@ -46,19 +45,19 @@ const documentation = {
 			},
 		},
 		'@schemas': {
-			Error401_schema: {
+			Error401_responseSchema: {
 				type: 'object',
 				required: ['message'],
 				properties: {
 					message: {
 						type: 'string',
 						format: 'string',
-						examples: 'Unauthorized. User is not authenticated',
-						description: 'Error message of the unauthorized response',
+						example: 'Unauthorized. User is not authorized.',
+						description: 'Error message to the unauthorized user.',
 					},
 				},
 			},
-			Error403_schema: {
+			Error403_responseSchema: {
 				type: 'object',
 				required: ['message'],
 				properties: {
@@ -66,11 +65,23 @@ const documentation = {
 						type: 'string',
 						format: 'string',
 						example: 'Forbidden',
-						description: 'Error message of the forbidden response',
+						description: 'Error message of the forbidden request.',
 					},
 				},
 			},
-			Error413_schema: {
+			Error404_responseSchema: {
+				type: 'object',
+				required: ['message'],
+				properties: {
+					message: {
+						type: 'string',
+						format: 'string',
+						example: 'Not found',
+						description: 'Error message of the not found request.',
+					},
+				},
+			},
+			Error413_responseSchema: {
 				type: 'object',
 				required: ['message'],
 				properties: {
@@ -78,23 +89,23 @@ const documentation = {
 						type: 'string',
 						format: 'string',
 						example: 'File size is too big. Should be less than 10 MB.',
-						description: 'Error message of the payload too large response',
+						description: 'Error message of the too large payload.',
 					},
 				},
 			},
-			Error415_schema: {
+			Error415_responseSchema: {
 				type: 'object',
 				required: ['message'],
 				properties: {
 					message: {
 						type: 'string',
 						format: 'string',
-						example: 'Incorrect file format for avatar. Only .png, .jpg and .jpeg formats are allowed!',
-						description: 'Error message of the unsupported media type response',
+						example: 'Incorrect file format. For the avatar only .png, .jpg and .jpeg formats are allowed!',
+						description: 'Error message of the unsupported media type.',
 					},
 				},
 			},
-			Error422_schema: {
+			Error422_responseSchema: {
 				type: 'object',
 				required: ['message'],
 				properties: {
@@ -102,11 +113,11 @@ const documentation = {
 						type: 'string',
 						format: 'string',
 						example: 'Unprocessable Entity',
-						description: 'Error message of the unprocessable entity response',
+						description: 'Error message of the unprocessable entity.',
 					},
 				},
 			},
-			Error500_schema: {
+			Error500_responseSchema: {
 				type: 'object',
 				required: ['message'],
 				properties: {
@@ -114,11 +125,11 @@ const documentation = {
 						type: 'string',
 						format: 'string',
 						example: 'Internal server error',
-						description: 'Error message of the internal server error response',
+						description: 'Error message of the internal server error.',
 					},
 				},
 			},
-			UserProfile_schema: {
+			UserProfile_responseSchema: {
 				type: 'object',
 				required: ['username', 'email', 'first_name', 'last_name', 'avatar', 'created_at', 'role'],
 				properties: {
@@ -163,10 +174,11 @@ const documentation = {
 						format: 'string',
 						example: 'user',
 						description: 'Users role',
+						enum: ['user', 'admin'],
 					},
 				},
 			},
-			SignInWithEmail_schema: {
+			SignInWithEmail_requestSchema: {
 				type: 'object',
 				required: ['password', 'email'],
 				properties: {
@@ -174,23 +186,23 @@ const documentation = {
 						type: 'string',
 						format: 'string',
 						example: 'ronald123',
-						description: 'Users password',
+						description: 'Users password.',
 					},
 					email: {
 						type: 'string',
 						format: 'string',
 						example: 'ronald123@example.com',
-						description: 'Users email',
+						description: 'Users email.',
 					},
 					username: {
 						type: 'string',
 						format: 'string',
 						example: 'ronald10',
-						description: 'Users username',
+						description: 'Users username.',
 					},
 				},
 			},
-			SignInWithUsername_schema: {
+			SignInWithUsername_requestSchema: {
 				type: 'object',
 				required: ['password', 'username'],
 				properties: {
@@ -198,23 +210,23 @@ const documentation = {
 						type: 'string',
 						format: 'string',
 						example: 'ronald123',
-						description: 'Users password',
+						description: 'Users password.',
 					},
 					username: {
 						type: 'string',
 						format: 'string',
 						example: 'ronald10',
-						description: 'Users username',
+						description: 'Users username.',
 					},
 					email: {
 						type: 'string',
 						format: 'string',
 						example: 'ronald123@example.com',
-						description: 'Users email',
+						description: 'Users email.',
 					},
 				},
 			},
-			SignUp_schema: {
+			SignUp_requestSchema: {
 				type: 'object',
 				required: ['username', 'email', 'password'],
 				properties: {
@@ -259,32 +271,6 @@ const documentation = {
 						type: 'string',
 						format: 'binary',
 						description: 'Users avatar',
-					},
-				},
-			},
-			CreateRequest_schema: {
-				type: 'object',
-				required: ['message'],
-				properties: {
-					message: {
-						type: 'string',
-						format: 'string',
-						example:
-							'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptate est fugit inventore vero! Animi odio iure quasi doloremque! Odio ducimus quidem enim unde animi nostrum, ad inventore quia laboriosam beatae?',
-						description: 'Message of the users request response',
-					},
-				},
-			},
-			GetRequests_schema: {
-				type: 'object',
-				required: ['request_status'],
-				properties: {
-					request_status: {
-						type: 'string',
-						format: 'string',
-						example: 'active',
-						description: 'Request status',
-						enum: ['active', 'resolved'],
 					},
 				},
 			},
@@ -385,7 +371,7 @@ const documentation = {
 					},
 				},
 			},
-			GetRequestsResponse_schema: {
+			Requests_responseSchema: {
 				type: 'object',
 				required: ['data', 'pageInfo'],
 				properties: {
@@ -402,7 +388,7 @@ const documentation = {
 			},
 		},
 		parameters: {
-			IDInPath_schema: {
+			IDInPath: {
 				in: 'path',
 				name: 'id',
 				description: 'Request id',
@@ -413,7 +399,7 @@ const documentation = {
 					example: 1,
 				},
 			},
-			PageInQuery_schema: {
+			PageInQuery: {
 				in: 'query',
 				name: 'page',
 				description: 'Page number',
@@ -424,7 +410,7 @@ const documentation = {
 					example: 1,
 				},
 			},
-			LimitInQuery_schema: {
+			LimitInQuery: {
 				in: 'query',
 				name: 'limit',
 				description: 'Limit of items per page',
@@ -439,7 +425,7 @@ const documentation = {
 	},
 };
 swaggerAutogen(outputFile, endpointsFiles, documentation).then((result) => {
-	console.log(`Swagger generation complete: ${result.success}`);
+	console.log(`Swagger generation status: ${result.success}`);
 	// swaggerConverter.convertFile(outputFile, {}, function (err, result) {
 	// 	if (err) {
 	// 		console.log(err);

@@ -11,12 +11,10 @@ Technologies used:
   - PostgresQL (Sequelize);
   - Insomnia <span style="font-size: smaller">(for testing and documenting API);</span>
   - OpenAPI (swagger) <span style="font-size: smaller">(for documenting API);</span>
-  - Docker + Compose <span style="color: red">(in progress)</span>.
+  - Docker + Compose.
 
 ---
 <br>
-
-#### App installation via Docker is in progress (this section does not work now)
 
 1. Clone repository/archive to your **local folder**;
 2. Open Terminal and make sure You are in **local folder**:
@@ -81,19 +79,9 @@ Technologies used:
 
 2. **API URLs**
 
-    2.1. **Insomnia API documentation**
+    **OpenAPI3 documentation**:
 
-    For browsing Insomnia API documentation change directory to the **./api/docs/insomnia** in Your project folder and run insomnia client server:
-
-    ```
-    npx serve
-    ```
-
-    p.s.: <span style="font-size: 12px">*press **Y** if any packages are required.*</span>
-
-    2.2. **OpenAPI3 documentation**:
-
-    OpenAPI3 (Swagger) documentation are also available with URL:
+    OpenAPI3 (Swagger) documentation is available with URL:
 
     ```
     http://0.0.0.0:3001/api/v1/docs

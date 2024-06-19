@@ -1,5 +1,4 @@
 // --------------------------------------CONTROLLER_CONFIG
-const fs = require('fs');
 const dotenv = require('dotenv');
 dotenv.config({ path: '../../.env' });
 const { User, TokenBlacklist, UserRole, UserRequest } = require('../models/db_orm.js');
@@ -12,8 +11,8 @@ const nodemailer = require('nodemailer');
 class RequestController {
 	async createRequest(req, res) {
 		// #swagger.tags = ['Users requests']
-		// #swagger.summary = 'Create a new request by User end-point.'
-		// #swagger.description = 'This is the end-point for creating a new request by User.'
+		// #swagger.summary = 'Create a new request by user end-point.'
+		// #swagger.description = 'This is the end-point for creating a new request by user.'
 		// #swagger.operationId = 'createRequest'
 		// #swagger.security = [{"bearerAuth": []}]
 		/*
@@ -22,11 +21,20 @@ class RequestController {
             content: {
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/CreateRequest_schema'
+                        type: 'object',
+				        required: ['message'],
+				        properties: {
+					        message: {
+						        type: 'string',
+						        format: 'string',
+						        example: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptate est fugit inventore vero! Animi odio iure quasi doloremque! Odio ducimus quidem enim unde animi nostrum, ad inventore quia laboriosam beatae?',
+						        description: 'Message of the request.',
+					            },
+				            },
+                        }
                     }
                 }
             }
-        }
         */
 		/*
         #swagger.responses[201] = {
@@ -41,7 +49,7 @@ class RequestController {
                                 type: 'string',
                                 format: 'string',
                                 example: 'Request created successfully!',
-                                description: 'Message of the successful creation of the request response',
+                                description: 'Message of the successful creation of the request.',
                             }
                         }
                     }
@@ -53,7 +61,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error403_schema'
+                        $ref: '#/components/schemas/Error403_responseSchema'
                     }
                 }
             }
@@ -63,7 +71,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error422_schema'
+                        $ref: '#/components/schemas/Error422_responseSchema'
                     }
                 }
             } 
@@ -73,43 +81,32 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error500_schema'
+                        $ref: '#/components/schemas/Error500_responseSchema'
                     }
                 }
             }
         }
 		 */
 		try {
-			const decodedToken = JWT.decode(req.headers.authorization.split(' ')[1]);
-			const username = decodedToken.username;
-			const email = decodedToken.email;
-			const role = await UserRole.findOne({ where: { id: decodedToken.role } }).then((result) => {
-				return result.role;
+			const token = req.headers.authorization.split(' ')[1];
+			await UserRole.findOne({ where: { id: JWT.decode(token).role } }).then((result) => {
+				if (result.role !== 'user') {
+					throw new Error('Only users can create requests!');
+				}
 			});
-			if (role === 'admin') {
-				throw new Error('Only users can create requests!');
-			}
-			await User.findOne({
+			const user = await User.findOne({
 				where: {
-					[Op.and]: [{ username: username }, { email: email }],
+					[Op.and]: [{ username: JWT.decode(token).username }, { email: JWT.decode(token).email }],
 				},
-			}).then((result) => {
-				UserRequest.create({
-					message: req.body.request_message,
-					created_by: result.id,
-				})
-					.then(() => {
-						res.status(201);
-						res.json({ message: 'Request was created successfully!' });
-						res.end();
-						return;
-					})
-					.catch((error) => {
-						res.status(500);
-						res.json({ message: error.message });
-						res.end();
-						return;
-					});
+			});
+			await UserRequest.create({
+				message: req.body.request_message,
+				created_by: user.id,
+			}).then(() => {
+				res.status(201);
+				res.json({ message: 'Request was created successfully!' });
+				res.end();
+				return;
 			});
 		} catch (error) {
 			if (error.message === 'Only users can create requests!') {
@@ -118,7 +115,6 @@ class RequestController {
 				res.end();
 				return;
 			}
-
 			res.status(500);
 			res.json({ message: error.message });
 			res.end();
@@ -128,16 +124,16 @@ class RequestController {
 
 	async getRequests(req, res) {
 		// #swagger.tags = ['Users requests']
-		// #swagger.summary = 'Get all requests by User end-point.'
-		// #swagger.description = 'This is the end-point for getting all requests by User.'
+		// #swagger.summary = 'Get all requests end-point.'
+		// #swagger.description = 'This is the end-point for getting all requests.'
 		// #swagger.operationId = 'getRequests'
 		// #swagger.security = [{"bearerAuth": []}]
 		/*
         #swagger.parameters['page'] = {
-            $ref: '#/components/parameters/PageInQuery_schema'
+            $ref: '#/components/parameters/PageInQuery'
         }
         #swagger.parameters['limit'] = {
-            $ref: '#/components/parameters/LimitInQuery_schema'
+            $ref: '#/components/parameters/LimitInQuery'
         }
         */
 		/*
@@ -145,12 +141,22 @@ class RequestController {
             required: true,
             content: {
                 'application/json': {
-                    schema: {
-                        $ref: '#/components/schemas/GetRequests_schema'
+                    schema: {         
+                        type: 'object',
+				        required: ['request_status'],
+				        properties: {
+					        request_status: {
+						        type: 'string',
+						        format: 'string',
+						        example: 'active',
+						        description: 'Request status.',
+						        enum: ['active', 'resolved'],
+					            },
+				            },
+                        }
                     }
                 }
             }
-        }
         */
 		/*
         #swagger.responses[200] = {
@@ -158,7 +164,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/GetRequestsResponse_schema'
+                        $ref: '#/components/schemas/Requests_responseSchema'
                     }
                 }
             }
@@ -168,7 +174,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error403_schema'
+                        $ref: '#/components/schemas/Error403_responseSchema'
                     }
                 }
             }
@@ -178,7 +184,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error422_schema'
+                        $ref: '#/components/schemas/Error422_responseSchema'
                     }
                 }
             }
@@ -188,7 +194,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error500_schema'
+                        $ref: '#/components/schemas/Error500_responseSchema'
                     }
                 }
             }
@@ -196,14 +202,12 @@ class RequestController {
         */
 		try {
 			const request_status = req.body.request_status;
-			const decodedToken = JWT.decode(req.headers.authorization.split(' ')[1]);
-			const role = await UserRole.findOne({ where: { id: decodedToken.role } }).then((result) => {
-				return result.role;
+			const token = req.headers.authorization.split(' ')[1];
+			await UserRole.findOne({ where: { id: JWT.decode(token).role } }).then((result) => {
+				if (result.role !== 'admin') {
+					throw new Error('Only admins can get requests!');
+				}
 			});
-			if (role === 'user') {
-				throw new Error('Only admins can get requests!');
-			}
-			// TODO: add pagination
 			const page = Number(req.query.page) || 1;
 			const limit = Number(req.query.limit) || 10;
 			const offset = (page - 1) * limit;
@@ -243,13 +247,13 @@ class RequestController {
 
 	async resolveRequest(req, res) {
 		// #swagger.tags = ['Users requests']
-		// #swagger.summary = 'Resolve request by admin end-point.'
-		// #swagger.description = 'This is the end-point for resolving requests by admins.'
-		// #swagger.operationId = 'resolveRequest'
+		// #swagger.summary = 'Resolve request end-point.'
+		// #swagger.description = 'This is the end-point for resolving requests.'
+		// #swagger.operationId = 'resolverequest'
 		// #swagger.security = [{"bearerAuth": []}]
 		/*
         #swagger.parameters['id'] = {
-            $ref: '#/components/parameters/IDInPath_schema'
+            $ref: '#/components/parameters/IDInPath'
         }
         */
 		/*
@@ -264,8 +268,8 @@ class RequestController {
                             comment: {
                                 type: 'string',
                                 format: 'string',
-                                example: 'Admin\'s resolution comment: ...',
-                                description: 'Admin\'s comment of the resolved request',
+                                example: 'Admin\'s resolution comment',
+                                description: 'Admin\'s comment in the resolved request.',
                             },
                         },
                     }
@@ -285,14 +289,14 @@ class RequestController {
                             message: {
                                 type: 'string',
                                 format: 'string',
-                                example: 'Request with ID: ___ was resolved successfully! Email reply was sent to user email.',
-                                description: 'Success message of resolved request',
+                                example: 'Request with ID: ${___} was resolved successfully! Email reply was sent to user email.',
+                                description: 'Success message of resolved request.',
                             },
                             email_reply: {
                                 type: 'string',
                                 format: 'string',
                                 example: 'https://ethereal.email/message/Z...',
-                                description: 'Link to successful email reply to the user response. Here is used Ethereal email service for testing purposes.',
+                                description: 'Link to successful email reply to the user. Here is used Ethereal: email service only for testing purposes.',
                             }
                         },
                     }
@@ -304,7 +308,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error403_schema'
+                        $ref: '#/components/schemas/Error403_responseSchema'
                     }
                 }
             }
@@ -314,16 +318,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        type: 'object',
-                        required: ['message'],
-                        properties: {
-                            message: {
-                                type: 'string',
-                                format: 'string',
-                                example: 'Request with ID: ___ not found or doesn\'t exist.',
-                                description: 'Error message of not found request',
-                            },
-                        },
+                        $ref: '#/components/schemas/Error404_responseSchema'
                     }
                 }
             }   
@@ -333,7 +328,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error422_schema'
+                        $ref: '#/components/schemas/Error422_responseSchema'
                     }
                 }
             }
@@ -343,27 +338,26 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error500_schema'
+                        $ref: '#/components/schemas/Error500_responseSchema'
                     }
                 }
             }
         }
         */
 		try {
-			const decodedToken = JWT.decode(req.headers.authorization.split(' ')[1]);
+			const token = req.headers.authorization.split(' ')[1];
 			const request_id = req.params.id;
 			const comment = req.body.comment;
-			// Check if user is admin
-			await UserRole.findOne({ where: { id: decodedToken.role } }).then((result) => {
+			await UserRole.findOne({ where: { id: JWT.decode(token).role } }).then((result) => {
 				if (result.role !== 'admin') {
 					throw new Error('Only admins can resolve requests!');
 				}
 			});
 			// Get admin information
 			const admin = await User.findOne({
-				where: { [Op.and]: [{ username: decodedToken.username }, { email: decodedToken.email }] },
+				where: { [Op.and]: [{ username: JWT.decode(token).username }, { email: JWT.decode(token).email }] },
 			});
-			// Get request creator information
+			// Get request creator (user) information
 			const user = await UserRequest.findOne({ where: { id: request_id } }).then((result) => {
 				return User.findOne({ where: { id: result.created_by } });
 			});
@@ -436,7 +430,7 @@ class RequestController {
 		// #swagger.security = [{"bearerAuth": []}]
 		/*
         #swagger.parameters['id'] = {
-           $ref: '#/components/parameters/IDInPath_schema'   
+           $ref: '#/components/parameters/IDInPath'   
         }
 		 */
 		/*
@@ -451,8 +445,8 @@ class RequestController {
                             message: {
                                 type: 'string',
                                 format: 'string',
-                                example: 'Request with ID: ${request_id} was deleted successfully!',
-                                description: 'Success message of the deleted request response',
+                                example: 'Request with ID: ${___} was deleted successfully!',
+                                description: 'Success message of the deleted request.',
                             },
                         },
                     }
@@ -464,7 +458,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error403_schema'
+                        $ref: '#/components/schemas/Error403_responseSchema'
                     }
                 }
             }
@@ -474,16 +468,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        type: 'object',
-                        required: ['message'],
-                        properties: {
-                            message: {
-                                type: 'string',
-                                format: 'string',
-                                example: 'Request with ID: ___ not found or doesn\'t exist.',
-                                description: 'Error message of the not found response',
-                            },
-                        },
+                        $ref: '#/components/schemas/Error404_responseSchema'
                     }
                 }
             }   
@@ -493,7 +478,7 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error422_schema'
+                        $ref: '#/components/schemas/Error422_responseSchema'
                     }
                 }
             }
@@ -503,21 +488,20 @@ class RequestController {
             content:{
                 'application/json': {
                     schema: {
-                        $ref: '#/components/schemas/Error500_schema'
+                        $ref: '#/components/schemas/Error500_responseSchema'
                     }
                 }
             }
         }
 		 */
 		try {
-			const decodedToken = JWT.decode(req.headers.authorization.split(' ')[1]);
-			const role = await UserRole.findOne({ where: { id: decodedToken.role } }).then((result) => {
-				return result.role;
-			});
-			if (role === 'user') {
-				throw new Error('Only admins can delete requests!');
-			}
+			const token = req.headers.authorization.split(' ')[1];
 			const request_id = req.params.id;
+			await UserRole.findOne({ where: { id: JWT.decode(token).role } }).then((result) => {
+				if (result.role !== 'admin') {
+					throw new Error('Only admins can delete requests!');
+				}
+			});
 			await UserRequest.findOne({ where: { id: request_id } }).then(async (result) => {
 				if (!result) {
 					throw new Error(`Request with ID: ${request_id} was not deleted or doesn't exist.`);

@@ -25,14 +25,14 @@ router.route('/').get(async (req, res) => {
 					type: 'string',
 					format: 'html',
 					example: '<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<meta charset="UTF-8">\n\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n\t<title>Document</title>\n</head>\n<body>\n\t<h1>Hello, world!</h1>\n</body>\n</html>',
-					description: 'Greeting HTML-page',
+					description: 'Greeting HTML-page.',
 				}
 			}
 		}
 	}
 	*/
 	res.status(200);
-	res.render('main.html', { server_host: `${process.env.SERVER_HOST ?? '127.0.0.1'}` });
+	res.render('main.html', { server_host: `${process.env.SERVER_HOST ?? '127.0.0.1'}`, server_port: process.env.SERVER_PORT_OUTER ?? 3000 });
 });
 
 // http://127.0.0.1:3000/api/v1/signup - SIGNUP_ROUTE
@@ -135,7 +135,6 @@ router.route('*').get(async (req, res) => {
 		message: 'Resource Not found. Please, check the URL and try again.',
 	});
 	res.end();
-	return;
 });
 
 // --------------------------------------EXPORT

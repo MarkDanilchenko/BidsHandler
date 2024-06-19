@@ -23,16 +23,16 @@ nunjucks.configure('views', {
 	views: `${__dirname}/views`,
 });
 
-// --------------------------------------SWAGGER_CONFIG
-const swaggerUI = require('swagger-ui-express');
-const swaggerDocumentation = JSON.parse(fs.readFileSync('./docs/swagger/swagger-output.json'));
-server.use(`/api/v1/docs`, swaggerUI.serve, swaggerUI.setup(swaggerDocumentation));
-
 // --------------------------------------COMMON_MIDDLEWARE
 server.use(express.json());
 server.use(express.urlencoded({ extended: false }));
 server.use('/api/v1', express.static(`${__dirname}/node_modules`));
 server.use('/api/v1', express.static(`${__dirname}/assets`));
+
+// --------------------------------------SWAGGER_CONFIG
+const swaggerUI = require('swagger-ui-express');
+const swaggerDocumentation = JSON.parse(fs.readFileSync('./docs/swagger/swagger-output.json'));
+server.use(`/api/v1/docs`, swaggerUI.serve, swaggerUI.setup(swaggerDocumentation));
 
 // --------------------------------------ROUTES
 server.use('/api/v1', APIRouter);
@@ -49,7 +49,6 @@ server.all('*', async (req, res) => {
 		message: 'Resource Not found. Please, check the URL and try again.',
 	});
 	res.end();
-	return;
 });
 
 // --------------------------------------EXPORT

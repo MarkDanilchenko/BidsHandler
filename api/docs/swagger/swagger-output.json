@@ -43,7 +43,7 @@
                   "type": "string",
                   "format": "html",
                   "example": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n\t<meta charset=\"UTF-8\">\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t<title>Document</title>\n</head>\n<body>\n\t<h1>Hello, world!</h1>\n</body>\n</html>",
-                  "description": "Greeting HTML-page"
+                  "description": "Greeting HTML-page."
                 }
               }
             }
@@ -57,7 +57,7 @@
           "Reg&Auth"
         ],
         "summary": "Sign up end-point.",
-        "description": "This is the end-point for the registration of new users in the system. Both users and admins can use it.",
+        "description": "This is the end-point for the registration new users in the system. Both users and admins can use it.",
         "operationId": "signup",
         "responses": {
           "200": {
@@ -76,8 +76,8 @@
                     "message": {
                       "type": "string",
                       "format": "string",
-                      "examples": "User signed up successfully!",
-                      "description": "Message of the successful signup of the user response"
+                      "example": "User signed up successfully!",
+                      "description": "Message of the successful signup."
                     }
                   }
                 }
@@ -97,8 +97,8 @@
                     "message": {
                       "type": "string",
                       "format": "string",
-                      "examples": "Invalid role. Should be \"user\" or \"admin\".",
-                      "description": "Error message of the bad request response"
+                      "example": "Invalid role. Should be \"user\" or \"admin\".",
+                      "description": "Error message of the bad request according to the role."
                     }
                   }
                 }
@@ -110,7 +110,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error413_schema"
+                  "$ref": "#/components/schemas/Error413_responseSchema"
                 }
               }
             }
@@ -120,7 +120,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error415_schema"
+                  "$ref": "#/components/schemas/Error415_responseSchema"
                 }
               }
             }
@@ -130,7 +130,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422_schema"
+                  "$ref": "#/components/schemas/Error422_responseSchema"
                 }
               }
             }
@@ -140,7 +140,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500_schema"
+                  "$ref": "#/components/schemas/Error500_responseSchema"
                 }
               }
             }
@@ -151,7 +151,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/SignUp_schema"
+                "$ref": "#/components/schemas/SignUp_requestSchema"
               }
             }
           }
@@ -164,7 +164,7 @@
           "Reg&Auth"
         ],
         "summary": "Sign in end-point.",
-        "description": "This is the end-point for the signing in of registered users in the system.",
+        "description": "This is the end-point to signin in the system.",
         "operationId": "signin",
         "responses": {
           "200": {
@@ -183,19 +183,19 @@
                       "type": "string",
                       "format": "string",
                       "example": "User signed in successfully!",
-                      "description": "Message of the successful sign in response"
+                      "description": "Message of the successful sign in."
                     },
                     "token_access": {
                       "type": "string",
                       "format": "string",
                       "example": "eyJhbGciOiJIUzI1NiIsInR...",
-                      "description": "Access token for the signed in user"
+                      "description": "Access token for the signed in user."
                     },
                     "token_refresh": {
                       "type": "string",
                       "format": "string",
                       "example": "eyJhbGciOjJIUzI1NiIsInR...",
-                      "description": "Refresh token for the signed in user"
+                      "description": "Refresh token for the signed in user."
                     }
                   }
                 }
@@ -207,7 +207,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401_schema"
+                  "$ref": "#/components/schemas/Error401_responseSchema"
                 }
               }
             }
@@ -217,7 +217,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422_schema"
+                  "$ref": "#/components/schemas/Error422_responseSchema"
                 }
               }
             }
@@ -227,7 +227,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500_schema"
+                  "$ref": "#/components/schemas/Error500_responseSchema"
                 }
               }
             }
@@ -240,10 +240,10 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/SignInWithEmail_schema"
+                    "$ref": "#/components/schemas/SignInWithEmail_requestSchema"
                   },
                   {
-                    "$ref": "#/components/schemas/SignInWithUsername_schema"
+                    "$ref": "#/components/schemas/SignInWithUsername_requestSchema"
                   }
                 ]
               }
@@ -258,7 +258,7 @@
           "Reg&Auth"
         ],
         "summary": "Sign out end-point.",
-        "description": "This is the end-point for the signing out of registered users in the system and blacklisting their refresh tokens permanently.",
+        "description": "This is the end-point to sign out in the system and blacklist their refresh tokens permanently.",
         "operationId": "signout",
         "parameters": [
           {
@@ -284,7 +284,7 @@
                       "type": "string",
                       "format": "string",
                       "example": "User signed out successfully!",
-                      "description": "Message of the successful sign out response"
+                      "description": "Message of the successful sign out."
                     }
                   }
                 }
@@ -296,7 +296,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401_schema"
+                  "$ref": "#/components/schemas/Error401_responseSchema"
                 }
               }
             }
@@ -306,7 +306,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422_schema"
+                  "$ref": "#/components/schemas/Error422_responseSchema"
                 }
               }
             }
@@ -316,7 +316,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500_schema"
+                  "$ref": "#/components/schemas/Error500_responseSchema"
                 }
               }
             }
@@ -335,7 +335,7 @@
           "Reg&Auth"
         ],
         "summary": "Refresh of the access token end-point.",
-        "description": "This is the end-point for the refreshing of the access token of registered users in the system.",
+        "description": "This is the end-point for the   access token.",
         "operationId": "refresh",
         "parameters": [
           {
@@ -362,13 +362,13 @@
                       "type": "string",
                       "format": "string",
                       "example": "Access token has been successfully refresh!",
-                      "description": "Message of the successful refresh of the access token response"
+                      "description": "Message of the successful refresh of the access token."
                     },
                     "token_access": {
                       "type": "string",
                       "format": "string",
                       "example": "eyJhbGciOiJIUzI1NiIsInR...",
-                      "description": "Access token of the user"
+                      "description": "Access token."
                     }
                   }
                 }
@@ -380,7 +380,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401_schema"
+                  "$ref": "#/components/schemas/Error401_responseSchema"
                 }
               }
             }
@@ -390,7 +390,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422_schema"
+                  "$ref": "#/components/schemas/Error422_responseSchema"
                 }
               }
             }
@@ -400,7 +400,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500_schema"
+                  "$ref": "#/components/schemas/Error500_responseSchema"
                 }
               }
             }
@@ -419,7 +419,7 @@
           "Reg&Auth"
         ],
         "summary": "User profile end-point.",
-        "description": "This is the end-point for the user profile of registered users in the system.",
+        "description": "This is the end-point for browsing users profile in the system.",
         "operationId": "profile",
         "parameters": [
           {
@@ -436,17 +436,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserProfile_schema"
+                  "$ref": "#/components/schemas/UserProfile_responseSchema"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422_schema"
+                  "$ref": "#/components/schemas/Error422_responseSchema"
                 }
               }
             }
@@ -456,7 +459,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500_schema"
+                  "$ref": "#/components/schemas/Error500_responseSchema"
                 }
               }
             }
@@ -474,8 +477,8 @@
         "tags": [
           "Users requests"
         ],
-        "summary": "Get all requests by User end-point.",
-        "description": "This is the end-point for getting all requests by User.",
+        "summary": "Get all requests end-point.",
+        "description": "This is the end-point for getting all requests.",
         "operationId": "getRequests",
         "parameters": [
           {
@@ -486,10 +489,10 @@
             }
           },
           {
-            "$ref": "#/components/parameters/PageInQuery_schema"
+            "$ref": "#/components/parameters/PageInQuery"
           },
           {
-            "$ref": "#/components/parameters/LimitInQuery_schema"
+            "$ref": "#/components/parameters/LimitInQuery"
           }
         ],
         "responses": {
@@ -498,17 +501,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetRequestsResponse_schema"
+                  "$ref": "#/components/schemas/Requests_responseSchema"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "403": {
             "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error403_schema"
+                  "$ref": "#/components/schemas/Error403_responseSchema"
                 }
               }
             }
@@ -518,7 +524,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422_schema"
+                  "$ref": "#/components/schemas/Error422_responseSchema"
                 }
               }
             }
@@ -528,7 +534,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500_schema"
+                  "$ref": "#/components/schemas/Error500_responseSchema"
                 }
               }
             }
@@ -544,7 +550,22 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/GetRequests_schema"
+                "type": "object",
+                "required": [
+                  "request_status"
+                ],
+                "properties": {
+                  "request_status": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "active",
+                    "description": "Request status.",
+                    "enum": [
+                      "active",
+                      "resolved"
+                    ]
+                  }
+                }
               }
             }
           }
@@ -554,8 +575,8 @@
         "tags": [
           "Users requests"
         ],
-        "summary": "Create a new request by User end-point.",
-        "description": "This is the end-point for creating a new request by User.",
+        "summary": "Create a new request by user end-point.",
+        "description": "This is the end-point for creating a new request by user.",
         "operationId": "createRequest",
         "parameters": [
           {
@@ -584,19 +605,22 @@
                       "type": "string",
                       "format": "string",
                       "example": "Request created successfully!",
-                      "description": "Message of the successful creation of the request response"
+                      "description": "Message of the successful creation of the request."
                     }
                   }
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
             "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error403_schema"
+                  "$ref": "#/components/schemas/Error403_responseSchema"
                 }
               }
             }
@@ -606,7 +630,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422_schema"
+                  "$ref": "#/components/schemas/Error422_responseSchema"
                 }
               }
             }
@@ -616,7 +640,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500_schema"
+                  "$ref": "#/components/schemas/Error500_responseSchema"
                 }
               }
             }
@@ -632,7 +656,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateRequest_schema"
+                "type": "object",
+                "required": [
+                  "message"
+                ],
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptate est fugit inventore vero! Animi odio iure quasi doloremque! Odio ducimus quidem enim unde animi nostrum, ad inventore quia laboriosam beatae?",
+                    "description": "Message of the request."
+                  }
+                }
               }
             }
           }
@@ -644,12 +679,12 @@
         "tags": [
           "Users requests"
         ],
-        "summary": "Resolve request by admin end-point.",
-        "description": "This is the end-point for resolving requests by admins.",
-        "operationId": "resolveRequest",
+        "summary": "Resolve request end-point.",
+        "description": "This is the end-point for resolving requests.",
+        "operationId": "resolverequest",
         "parameters": [
           {
-            "$ref": "#/components/parameters/IDInPath_schema"
+            "$ref": "#/components/parameters/IDInPath"
           },
           {
             "name": "authorization",
@@ -673,26 +708,29 @@
                     "message": {
                       "type": "string",
                       "format": "string",
-                      "example": "Request with ID: ___ was resolved successfully! Email reply was sent to user email.",
-                      "description": "Success message of resolved request"
+                      "example": "Request with ID: ${___} was resolved successfully! Email reply was sent to user email.",
+                      "description": "Success message of resolved request."
                     },
                     "email_reply": {
                       "type": "string",
                       "format": "string",
                       "example": "https://ethereal.email/message/Z...",
-                      "description": "Link to successful email reply to the user response. Here is used Ethereal email service for testing purposes."
+                      "description": "Link to successful email reply to the user. Here is used Ethereal: email service only for testing purposes."
                     }
                   }
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
             "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error403_schema"
+                  "$ref": "#/components/schemas/Error403_responseSchema"
                 }
               }
             }
@@ -702,18 +740,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": [
-                    "message"
-                  ],
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "format": "string",
-                      "example": "Request with ID: ___ not found or doesn't exist.",
-                      "description": "Error message of not found request"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Error404_responseSchema"
                 }
               }
             }
@@ -723,7 +750,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422_schema"
+                  "$ref": "#/components/schemas/Error422_responseSchema"
                 }
               }
             }
@@ -733,7 +760,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500_schema"
+                  "$ref": "#/components/schemas/Error500_responseSchema"
                 }
               }
             }
@@ -757,8 +784,8 @@
                   "comment": {
                     "type": "string",
                     "format": "string",
-                    "example": "Admin's resolution comment: ...",
-                    "description": "Admin's comment of the resolved request"
+                    "example": "Admin's resolution comment",
+                    "description": "Admin's comment in the resolved request."
                   }
                 }
               }
@@ -775,7 +802,7 @@
         "operationId": "deleteRequest",
         "parameters": [
           {
-            "$ref": "#/components/parameters/IDInPath_schema"
+            "$ref": "#/components/parameters/IDInPath"
           },
           {
             "name": "authorization",
@@ -799,20 +826,23 @@
                     "message": {
                       "type": "string",
                       "format": "string",
-                      "example": "Request with ID: ${request_id} was deleted successfully!",
-                      "description": "Success message of the deleted request response"
+                      "example": "Request with ID: ${___} was deleted successfully!",
+                      "description": "Success message of the deleted request."
                     }
                   }
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
             "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error403_schema"
+                  "$ref": "#/components/schemas/Error403_responseSchema"
                 }
               }
             }
@@ -822,18 +852,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": [
-                    "message"
-                  ],
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "format": "string",
-                      "example": "Request with ID: ___ not found or doesn't exist.",
-                      "description": "Error message of the not found response"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Error404_responseSchema"
                 }
               }
             }
@@ -843,7 +862,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422_schema"
+                  "$ref": "#/components/schemas/Error422_responseSchema"
                 }
               }
             }
@@ -853,7 +872,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500_schema"
+                  "$ref": "#/components/schemas/Error500_responseSchema"
                 }
               }
             }
@@ -875,7 +894,7 @@
       }
     },
     "parameters": {
-      "IDInPath_schema": {
+      "IDInPath": {
         "in": "path",
         "name": "id",
         "description": "Request id",
@@ -886,7 +905,7 @@
           "example": 1
         }
       },
-      "PageInQuery_schema": {
+      "PageInQuery": {
         "in": "query",
         "name": "page",
         "description": "Page number",
@@ -897,7 +916,7 @@
           "example": 1
         }
       },
-      "LimitInQuery_schema": {
+      "LimitInQuery": {
         "in": "query",
         "name": "limit",
         "description": "Limit of items per page",
@@ -910,7 +929,7 @@
       }
     },
     "schemas": {
-      "Error401_schema": {
+      "Error401_responseSchema": {
         "type": "object",
         "required": [
           "message"
@@ -919,12 +938,12 @@
           "message": {
             "type": "string",
             "format": "string",
-            "examples": "Unauthorized. User is not authenticated",
-            "description": "Error message of the unauthorized response"
+            "example": "Unauthorized. User is not authorized.",
+            "description": "Error message to the unauthorized user."
           }
         }
       },
-      "Error403_schema": {
+      "Error403_responseSchema": {
         "type": "object",
         "required": [
           "message"
@@ -934,11 +953,25 @@
             "type": "string",
             "format": "string",
             "example": "Forbidden",
-            "description": "Error message of the forbidden response"
+            "description": "Error message of the forbidden request."
           }
         }
       },
-      "Error413_schema": {
+      "Error404_responseSchema": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "format": "string",
+            "example": "Not found",
+            "description": "Error message of the not found request."
+          }
+        }
+      },
+      "Error413_responseSchema": {
         "type": "object",
         "required": [
           "message"
@@ -948,11 +981,11 @@
             "type": "string",
             "format": "string",
             "example": "File size is too big. Should be less than 10 MB.",
-            "description": "Error message of the payload too large response"
+            "description": "Error message of the too large payload."
           }
         }
       },
-      "Error415_schema": {
+      "Error415_responseSchema": {
         "type": "object",
         "required": [
           "message"
@@ -961,12 +994,12 @@
           "message": {
             "type": "string",
             "format": "string",
-            "example": "Incorrect file format for avatar. Only .png, .jpg and .jpeg formats are allowed!",
-            "description": "Error message of the unsupported media type response"
+            "example": "Incorrect file format. For the avatar only .png, .jpg and .jpeg formats are allowed!",
+            "description": "Error message of the unsupported media type."
           }
         }
       },
-      "Error422_schema": {
+      "Error422_responseSchema": {
         "type": "object",
         "required": [
           "message"
@@ -976,11 +1009,11 @@
             "type": "string",
             "format": "string",
             "example": "Unprocessable Entity",
-            "description": "Error message of the unprocessable entity response"
+            "description": "Error message of the unprocessable entity."
           }
         }
       },
-      "Error500_schema": {
+      "Error500_responseSchema": {
         "type": "object",
         "required": [
           "message"
@@ -990,11 +1023,11 @@
             "type": "string",
             "format": "string",
             "example": "Internal server error",
-            "description": "Error message of the internal server error response"
+            "description": "Error message of the internal server error."
           }
         }
       },
-      "UserProfile_schema": {
+      "UserProfile_responseSchema": {
         "type": "object",
         "required": [
           "username",
@@ -1046,11 +1079,15 @@
             "type": "string",
             "format": "string",
             "example": "user",
-            "description": "Users role"
+            "description": "Users role",
+            "enum": [
+              "user",
+              "admin"
+            ]
           }
         }
       },
-      "SignInWithEmail_schema": {
+      "SignInWithEmail_requestSchema": {
         "type": "object",
         "required": [
           "password",
@@ -1061,23 +1098,23 @@
             "type": "string",
             "format": "string",
             "example": "ronald123",
-            "description": "Users password"
+            "description": "Users password."
           },
           "email": {
             "type": "string",
             "format": "string",
             "example": "ronald123@example.com",
-            "description": "Users email"
+            "description": "Users email."
           },
           "username": {
             "type": "string",
             "format": "string",
             "example": "ronald10",
-            "description": "Users username"
+            "description": "Users username."
           }
         }
       },
-      "SignInWithUsername_schema": {
+      "SignInWithUsername_requestSchema": {
         "type": "object",
         "required": [
           "password",
@@ -1088,23 +1125,23 @@
             "type": "string",
             "format": "string",
             "example": "ronald123",
-            "description": "Users password"
+            "description": "Users password."
           },
           "username": {
             "type": "string",
             "format": "string",
             "example": "ronald10",
-            "description": "Users username"
+            "description": "Users username."
           },
           "email": {
             "type": "string",
             "format": "string",
             "example": "ronald123@example.com",
-            "description": "Users email"
+            "description": "Users email."
           }
         }
       },
-      "SignUp_schema": {
+      "SignUp_requestSchema": {
         "type": "object",
         "required": [
           "username",
@@ -1156,38 +1193,6 @@
             "type": "string",
             "format": "binary",
             "description": "Users avatar"
-          }
-        }
-      },
-      "CreateRequest_schema": {
-        "type": "object",
-        "required": [
-          "message"
-        ],
-        "properties": {
-          "message": {
-            "type": "string",
-            "format": "string",
-            "example": "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptate est fugit inventore vero! Animi odio iure quasi doloremque! Odio ducimus quidem enim unde animi nostrum, ad inventore quia laboriosam beatae?",
-            "description": "Message of the users request response"
-          }
-        }
-      },
-      "GetRequests_schema": {
-        "type": "object",
-        "required": [
-          "request_status"
-        ],
-        "properties": {
-          "request_status": {
-            "type": "string",
-            "format": "string",
-            "example": "active",
-            "description": "Request status",
-            "enum": [
-              "active",
-              "resolved"
-            ]
           }
         }
       },
@@ -1307,7 +1312,7 @@
           }
         }
       },
-      "GetRequestsResponse_schema": {
+      "Requests_responseSchema": {
         "type": "object",
         "required": [
           "data",
