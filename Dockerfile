@@ -1,20 +1,17 @@
-# Node version
-ARG NODE_VERSION=20.11.0
+ARG NODE_VERSION=22.7.0
 
-# ------------------------------------------------------BACKEND
+FROM node:${NODE_VERSION} as BACKEND
 
-from node:${NODE_VERSION} as BACKEND
-
-LABEL maintainer="2023 MyHomeworks, { }"
+LABEL maintainer="2024 MyHomeworks, { }"
 
 WORKDIR /app
 
-COPY ./.env .
+COPY ./.env.public .
 
-WORKDIR /app/api
+WORKDIR /app/server
 
-COPY ./api/package.json .
+COPY ./server/package.json .
 
 RUN npm install
 
-COPY ./api .
+COPY ./server .
