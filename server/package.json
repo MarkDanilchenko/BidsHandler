@@ -7,11 +7,11 @@
     "scss": "sass --watch ./assets/scss/index.scss:./assets/css/index.css",
     "start:dev": "nodemon index.js",
     "start": "node index.js",
-    "format": "eslint . --fix && prettier --write .",
-    "swagger": "node ./docs/swagger/index.js"
+    "format": "eslint . --fix && prettier --write ."
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
@@ -26,8 +26,15 @@
     "sass": "^1.77.4",
     "sequelize": "^6.37.3",
     "swagger-autogen": "^2.23.7",
-    "swagger-ui-express": "^5.0.1",
-    "swagger2openapi": "^7.0.8"
+    "winston": "^3.17.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "eslint": "^9.23.0",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3"
   },
   "browserslist": [
     "last 2 versions",
