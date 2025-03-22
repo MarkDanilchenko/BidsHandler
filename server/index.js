@@ -6,7 +6,7 @@ import server from "./server.js";
 
 async function startServer() {
   try {
-    await sequelizeConnection.sync({ alter: true });
+    await sequelizeConnection.sync({ force: true });
 
     logger.info(`PostgreSQL connected on host: ${postgreSQLOptions.host}, port: ${postgreSQLOptions.port}`);
 

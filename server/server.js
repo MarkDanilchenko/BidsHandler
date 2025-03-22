@@ -37,11 +37,11 @@ nunjucks.configure("views", {
 server.use(cors({ origin: "*" }));
 server.use(cookieParser(expressOptions.cookieSecret));
 server.use(express.json());
-server.use(express.urlencoded({ extended: false }));
 server.use((req, res, next) => {
   res.setHeader("Content-Type", "application/json");
   next();
 });
+server.use(express.urlencoded({ extended: false }));
 
 server.use("/uploads", express.static(path.dirname(import.meta.url) + "/uploads"));
 // server.use('/api/v1', express.static(`${__dirname}/node_modules`));
