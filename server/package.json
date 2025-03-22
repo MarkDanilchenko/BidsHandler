@@ -7,7 +7,8 @@
     "scss": "sass --watch ./assets/scss/index.scss:./assets/css/index.css",
     "start:dev": "nodemon index.js",
     "start": "node index.js",
-    "format": "eslint . --fix && prettier --write ."
+    "format": "eslint . --fix && prettier --write .",
+    "swagger": "node ./services/swaggerConfig.js"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
@@ -26,6 +27,7 @@
     "sass": "^1.77.4",
     "sequelize": "^6.37.3",
     "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1",
     "winston": "^3.17.0",
     "zod": "^3.24.2"
   },

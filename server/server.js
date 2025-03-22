@@ -1,55 +1,77 @@
-// --------------------------------------SERVER_CONFIG
-const fs = require('fs');
-const express = require('express');
+import path from "path";
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import nunjucks from "nunjucks";
+import { expressOptions } from "./env.js";
+import swaggerUI from "swagger-ui-express";
+import fs from "fs";
+import authRouter from "./router/auth.js";
+import userRouter from "./router/user.js";
+import bidsRouter from "./router/bids.js";
+
 const server = express();
-const cors = require('cors');
-const corsOptions = {
-	origin: '*',
+
+const swaggerDocs = fs.readFileSync("./docs/swagger-output.json", "utf-8");
+const swaggerUIOptions = {
+  explorer: true,
+  swaggerOptions: {
+    url: "/api/v1/docs/swagger-output.json",
+  },
 };
-server.use(cors(corsOptions));
-const { router: APIRouter } = require('./routes/router.js');
-const nunjucks = require('nunjucks');
-nunjucks.configure('views', {
-	autoescape: true,
-	express: server,
-	tags: {
-		blockStart: '{%',
-		blockEnd: '%}',
-		variableStart: '{{',
-		variableEnd: '}}',
-		commentStart: '{#',
-		commentEnd: '#}',
-	},
-	views: `${__dirname}/views`,
+
+nunjucks.configure("views", {
+  autoescape: true,
+  express: server,
+  tags: {
+    blockStart: "{%",
+    blockEnd: "%}",
+    variableStart: "{{",
+    variableEnd: "}}",
+    commentStart: "{#",
+    commentEnd: "#}",
+  },
+  views: path.dirname(import.meta.url) + "/views",
 });
 
-// --------------------------------------COMMON_MIDDLEWARE
+server.use(cors({ origin: "*" }));
+server.use(cookieParser(expressOptions.cookieSecret));
 server.use(express.json());
 server.use(express.urlencoded({ extended: false }));
-server.use('/api/v1', express.static(`${__dirname}/node_modules`));
-server.use('/api/v1', express.static(`${__dirname}/assets`));
-
-// --------------------------------------SWAGGER_CONFIG
-const swaggerUI = require('swagger-ui-express');
-const swaggerDocumentation = JSON.parse(fs.readFileSync('./docs/swagger/swagger-output.json'));
-server.use(`/api/v1/docs`, swaggerUI.serve, swaggerUI.setup(swaggerDocumentation));
-
-// --------------------------------------ROUTES
-server.use('/api/v1', APIRouter);
-
-// http://127.0.0.1:3000/ - GREETING_ROUTE (redirects to /api/v1/)
-server.all('/', async (req, res) => {
-	res.status(302).redirect('/api/v1');
+server.use((req, res, next) => {
+  res.setHeader("Content-Type", "application/json");
+  next();
 });
 
-// http://127.0.0.1:3000/* - NOT_FOUND
-server.all('*', async (req, res) => {
-	res.status(404);
-	res.json({
-		message: 'Resource Not found. Please, check the URL and try again.',
-	});
-	res.end();
+server.use("/uploads", express.static(path.dirname(import.meta.url) + "/uploads"));
+// server.use('/api/v1', express.static(`${__dirname}/node_modules`));
+// server.use('/api/v1', express.static(`${__dirname}/assets`));
+
+server.get("/api/v1/docs/swagger-output.json", (req, res) => {
+  res.status(200);
+  res.json(swaggerDocs);
+  res.end();
+});
+server.use("/api/v1/docs", swaggerUI.serveFiles(null, swaggerUIOptions), swaggerUI.setup(null, swaggerUIOptions));
+
+server.all("/", (req, res) => {
+  res.status(302).redirect("/api/v1");
 });
 
-// --------------------------------------EXPORT
-module.exports = { server };
+server.use("/api/v1/auth", authRouter);
+server.use("/api/v1/user", userRouter);
+server.use("/api/v1/bids", bidsRouter);
+
+server.get("/test", (req, res) => {
+  res.status(200);
+  res.send(JSON.stringify({ message: "test" }));
+  res.end();
+});
+
+server.all("*", (req, res) => {
+  res.status(404);
+  res.send(JSON.stringify({ message: "Resource is not Found" }));
+  res.end();
+});
+
+export default server;
