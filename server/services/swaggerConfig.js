@@ -27,7 +27,7 @@ const docConfig = {
       description: "Bids end-points",
     },
   ],
-  components: {},
+  components: {}, // TODO schemas
 };
 const outputFile = "../docs/swagger-output.json";
 const endpointsFiles = ["../server.js"];

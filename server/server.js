@@ -9,8 +9,11 @@ import fs from "fs";
 import authRouter from "./router/auth.js";
 import userRouter from "./router/user.js";
 import bidsRouter from "./router/bids.js";
+import commonRouter from "./router/common.js";
+import { fileURLToPath } from "url";
 
 const server = express();
+const absolutePath = path.dirname(fileURLToPath(import.meta.url));
 
 const swaggerDocs = fs.readFileSync("./docs/swagger-output.json", "utf-8");
 const swaggerUIOptions = {
@@ -31,21 +34,22 @@ nunjucks.configure("views", {
     commentStart: "{#",
     commentEnd: "#}",
   },
-  views: path.dirname(import.meta.url) + "/views",
+  views: absolutePath + "/views",
 });
+server.set("view engine", "html");
 
 server.use(cors({ origin: "*" }));
 server.use(cookieParser(expressOptions.cookieSecret));
 server.use(express.json());
+server.use(express.urlencoded({ extended: true }));
 server.use((req, res, next) => {
-  server.use(express.urlencoded({ extended: false }));
   res.setHeader("Content-Type", "application/json");
   next();
 });
 
-server.use("/uploads", express.static(path.dirname(import.meta.url) + "/uploads"));
+server.use("/static", express.static(path.join(absolutePath, "/assets")));
+server.use("/uploads", express.static(path.join(absolutePath, "/uploads")));
 // server.use('/api/v1', express.static(`${__dirname}/node_modules`));
-// server.use('/api/v1', express.static(`${__dirname}/assets`));
 
 server.get("/api/v1/docs/swagger-output.json", (req, res) => {
   res.status(200);
@@ -54,13 +58,14 @@ server.get("/api/v1/docs/swagger-output.json", (req, res) => {
 });
 server.use("/api/v1/docs", swaggerUI.serveFiles(null, swaggerUIOptions), swaggerUI.setup(null, swaggerUIOptions));
 
-server.all("/", (req, res) => {
-  res.status(302).redirect("/api/v1");
+server.get("/", (req, res) => {
+  res.status(302).redirect("/api/v1/");
 });
 
 server.use("/api/v1/auth", authRouter);
 server.use("/api/v1/user", userRouter);
 server.use("/api/v1/bids", bidsRouter);
+server.use("/api/v1", commonRouter);
 
 server.get("/test", (req, res) => {
   res.status(200);
