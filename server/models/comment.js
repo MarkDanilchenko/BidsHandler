@@ -15,6 +15,22 @@ export default function CommentModelInit(sequelizeConfig) {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      authorId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+          model: "users",
+          key: "id",
+        },
+      },
+      bidId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+          model: "bids",
+          key: "id",
+        },
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

@@ -14,6 +14,14 @@ export default function JwtModelInit(sequelizeConfig) {
       allowNull: false,
       unique: true,
     },
+    userId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
+    },
   });
 
   return Jwt;

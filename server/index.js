@@ -15,7 +15,7 @@ async function startServer() {
       fs.mkdirSync("./uploads/avatars", { recursive: true });
     }
 
-    server.listen(expressOptions.host, expressOptions.port, () => {
+    server.listen(expressOptions.port, expressOptions.host, () => {
       logger.info(`Server is running on http://${expressOptions.host}:${expressOptions.port}`);
     });
   } catch (error) {

@@ -38,10 +38,10 @@ server.use(cors({ origin: "*" }));
 server.use(cookieParser(expressOptions.cookieSecret));
 server.use(express.json());
 server.use((req, res, next) => {
+  server.use(express.urlencoded({ extended: false }));
   res.setHeader("Content-Type", "application/json");
   next();
 });
-server.use(express.urlencoded({ extended: false }));
 
 server.use("/uploads", express.static(path.dirname(import.meta.url) + "/uploads"));
 // server.use('/api/v1', express.static(`${__dirname}/node_modules`));
