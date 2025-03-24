@@ -1,3 +1,6 @@
-@import './style_fonts.scss';
-@import './style_colors.scss';
-@import './style_greetingPage.scss';
+@import "./colors.scss";
+@import "./fonts.scss";
+
+@import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
+
+@import "./startPage.scss";

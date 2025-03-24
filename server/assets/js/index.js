@@ -1,2 +1,3 @@
-// import { animation_logoMainPage } from "./animation_logoMainPage.js";
-// animation_logoMainPage();
+import "../scss/index.scss";
+
+import "../../node_modules/bootstrap/dist/js/bootstrap.bundle.js";

@@ -8,7 +8,8 @@
     "start": "node index.js",
     "format": "eslint . --fix && prettier --write .",
     "swagger": "node ./services/swaggerConfig.js",
-    "build:static": "webpack"
+    "build:static": "webpack",
+    "build:static:dev": "webpack --watch"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
