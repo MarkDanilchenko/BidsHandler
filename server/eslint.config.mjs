@@ -1,28 +1,31 @@
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import pluginPrettier from "eslint-plugin-prettier";
+import pluginJest from "eslint-plugin-jest";
 
 export default [
   pluginJs.configs.recommended,
   {
     plugins: {
       prettier: pluginPrettier,
+      jest: pluginJest,
     },
   },
   {
     ignores: ["**/node_modules/**", "**/dist/**", "**/build/**", "**/public/**", "**/coverage/**"],
   },
   {
-    files: ["**/*.js", "**/*.ts"],
+    files: ["**/*.js", "**/*.ts", "**/*.spec.js", "**/*.test.js"],
   },
   {
     languageOptions: {
       globals: {
         ...globals.browser,
         ...globals.node,
-        ...globals.jquery, // для коректной работы jquery
+        ...globals.jquery,
         ...globals.jest,
         ...globals.es2021,
+        globals: pluginJest.environments.globals.globals,
       },
     },
   },
@@ -35,6 +38,11 @@ export default [
           printWidth: 120,
         },
       ],
+      "jest/no-disabled-tests": "warn",
+      "jest/no-focused-tests": "error",
+      "jest/no-identical-title": "error",
+      "jest/prefer-to-have-length": "warn",
+      "jest/valid-expect": "error",
       "prefer-const": "warn",
       "no-console": "warn",
       "no-unused-vars": "error",

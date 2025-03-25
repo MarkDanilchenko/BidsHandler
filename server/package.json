@@ -9,7 +9,8 @@
     "format": "eslint . --fix && prettier --write .",
     "swagger": "node ./services/swaggerConfig.js",
     "build:static": "webpack",
-    "build:static:dev": "webpack --watch"
+    "build:static:dev": "webpack --watch",
+    "test": "jest"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
@@ -38,12 +39,15 @@
     "babel-loader": "^10.0.0",
     "css-loader": "^7.1.2",
     "eslint": "^9.23.0",
+    "eslint-plugin-jest": "^28.11.0",
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^16.0.0",
+    "jest": "^29.7.0",
     "prettier": "^3.5.3",
     "sass": "^1.86.0",
     "sass-loader": "^16.0.5",
     "style-loader": "^4.0.0",
+    "supertest": "^7.1.0",
     "webpack": "^5.98.0",
     "webpack-cli": "^6.0.1"
   },
@@ -51,5 +55,20 @@
     "last 2 versions",
     "> 1%",
     "not ie < 10"
-  ]
+  ],
+  "jest": {
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "js",
+      "json"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/dist/"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/dist/"
+    ]
+  }
 }
