@@ -2,6 +2,7 @@ import swaggerAutogen from "swagger-autogen";
 import { expressOptions } from "../env.js";
 
 const docConfig = {
+  openapi: "3.0.0",
   info: {
     version: "1.0.0",
     title: "BidsHandler API Documentation (OpenAPIv3)",

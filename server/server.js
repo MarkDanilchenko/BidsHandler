@@ -15,14 +15,6 @@ import { fileURLToPath } from "url";
 const server = express();
 const absolutePath = path.dirname(fileURLToPath(import.meta.url));
 
-const swaggerDocs = fs.readFileSync("./docs/swagger-output.json", "utf-8");
-const swaggerUIOptions = {
-  explorer: true,
-  swaggerOptions: {
-    url: "/api/v1/docs/swagger-output.json",
-  },
-};
-
 nunjucks.configure("views", {
   autoescape: true,
   express: server,
@@ -42,23 +34,49 @@ server.use(cors({ origin: "*" }));
 server.use(cookieParser(expressOptions.cookieSecret));
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
-server.use((req, res, next) => {
-  res.setHeader("Content-Type", "application/json");
-  next();
-});
 
 server.use("/static", express.static(path.join(absolutePath, "/assets")));
 server.use("/uploads", express.static(path.join(absolutePath, "/uploads")));
 // server.use('/api/v1', express.static(`${__dirname}/node_modules`));
 
+const swaggerDocs = fs.readFileSync("./docs/swagger-output.json", "utf-8");
+const swaggerUIOptions = {
+  explorer: true,
+  swaggerOptions: {
+    url: "/api/v1/docs/swagger-output.json",
+  },
+};
+
 server.get("/api/v1/docs/swagger-output.json", (req, res) => {
+  /*
+  #swagger.ignore = true
+  */
   res.status(200);
-  res.json(swaggerDocs);
+  res.json(JSON.parse(swaggerDocs));
   res.end();
 });
 server.use("/api/v1/docs", swaggerUI.serveFiles(null, swaggerUIOptions), swaggerUI.setup(null, swaggerUIOptions));
 
 server.get("/", (req, res) => {
+  /*
+  #swagger.tags = ['Redirect']
+  #swagger.summary = 'Redirect to the API home page.'
+  #swagger.description = 'This is a redirect to the API home page.'
+  #swagger.operationId = 'redirect'
+  #swagger.responses[302] = {
+    description: 'Redirect to the API home page.',
+    content: {
+      'text/html': {
+        schema: {
+          type: 'string',
+          format: 'string',
+          example: 'http://localhost:3000/api/v1/',
+          description: 'API home page URL.',
+        }
+      }
+    }
+  }
+  */
   res.status(302).redirect("/api/v1/");
 });
 
@@ -68,12 +86,18 @@ server.use("/api/v1/bids", bidsRouter);
 server.use("/api/v1", commonRouter);
 
 server.get("/test", (req, res) => {
+  /*
+  #swagger.ignore = true
+  */
   res.status(200);
   res.send(JSON.stringify({ message: "test" }));
   res.end();
 });
 
 server.all("*", (req, res) => {
+  /*
+  #swagger.ignore = true
+  */
   res.status(404);
   res.send(JSON.stringify({ message: "Resource is not Found" }));
   res.end();

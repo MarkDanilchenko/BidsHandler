@@ -26,22 +26,50 @@
     }
   ],
   "paths": {
-    "/api/v1/docs/swagger-output.json": {
+    "/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Redirect"
+        ],
+        "summary": "Redirect to the API home page.",
+        "description": "This is a redirect to the API home page.",
+        "operationId": "redirect",
         "responses": {
-          "200": {
-            "description": "OK"
+          "302": {
+            "description": "Redirect to the API home page.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string",
+                  "format": "string",
+                  "example": "http://localhost:3000/api/v1/",
+                  "description": "API home page URL."
+                }
+              }
+            }
           }
         }
       }
     },
-    "/test": {
+    "/api/v1/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Greeting"
+        ],
+        "summary": "Greeting HTML-page end-point.",
+        "description": "This is a base greeting HTML-page of the API.",
+        "operationId": "greeting",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string",
+                  "format": "html"
+                }
+              }
+            }
           }
         }
       }
