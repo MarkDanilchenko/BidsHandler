@@ -10,7 +10,7 @@
     "swagger": "node ./services/swaggerConfig.js",
     "build:static": "webpack",
     "build:static:dev": "webpack --watch",
-    "test": "jest"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
@@ -36,6 +36,7 @@
     "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
     "@eslint/js": "^9.23.0",
+    "babel-jest": "^29.7.0",
     "babel-loader": "^10.0.0",
     "css-loader": "^7.1.2",
     "eslint": "^9.23.0",
@@ -55,20 +56,5 @@
     "last 2 versions",
     "> 1%",
     "not ie < 10"
-  ],
-  "jest": {
-    "testEnvironment": "node",
-    "moduleFileExtensions": [
-      "js",
-      "json"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/dist/"
-    ],
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/dist/"
-    ]
-  }
+  ]
 }
