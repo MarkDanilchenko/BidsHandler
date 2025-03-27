@@ -37,7 +37,6 @@ server.use(express.urlencoded({ extended: true }));
 
 server.use("/static", express.static(path.join(absolutePath, "/assets")));
 server.use("/uploads", express.static(path.join(absolutePath, "/uploads")));
-// server.use('/api/v1', express.static(`${__dirname}/node_modules`));
 
 const swaggerDocs = fs.readFileSync("./docs/swagger-output.json", "utf-8");
 const swaggerUIOptions = {
@@ -46,7 +45,6 @@ const swaggerUIOptions = {
     url: "/api/v1/docs/swagger-output.json",
   },
 };
-
 server.get("/api/v1/docs/swagger-output.json", (req, res) => {
   /*
   #swagger.ignore = true
