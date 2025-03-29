@@ -16,7 +16,7 @@ const docConfig = {
   ],
   tags: [
     {
-      name: "Start page",
+      name: "Greeting",
       description: "Start page of the API",
     },
     {
@@ -27,9 +27,74 @@ const docConfig = {
       name: "Bids",
       description: "Bids end-points",
     },
+    {
+      name: "Redirect",
+      description: "Redirect to the API home page",
+    },
   ],
-  components: {}, // TODO schemas
+  components: {
+    "@schemas": {
+      RequestSignUpSchema: {
+        type: "object",
+        required: ["username", "email", "password"],
+        properties: {
+          username: {
+            type: "string",
+            example: "John_Doe",
+            description: "Users username",
+          },
+          firstName: {
+            type: "string",
+            example: "John",
+            description: "Users First name",
+          },
+          lastName: {
+            type: "string",
+            example: "Doe",
+            description: "Users Last name",
+          },
+          email: {
+            type: "string",
+            example: "QKx0o@example.com",
+            description: "Users email",
+          },
+          password: {
+            type: "string",
+            example: "12345678",
+            description: "Users password",
+          },
+          gender: {
+            type: "string",
+            example: "male",
+            description: "Users gender",
+          },
+          isAdmin: {
+            type: "boolean",
+            example: true,
+            description: "Users role",
+          },
+          avatar: {
+            type: "string",
+            format: "binary",
+            description: "Users avatar file in multipart",
+          },
+        },
+      },
+      Response400Schema: {
+        type: "object",
+        required: ["message"],
+        properties: {
+          message: {
+            type: "string",
+            example: "Bad Request",
+            description: "Error message",
+          },
+        },
+      },
+    },
+  },
 };
+
 const outputFile = "../docs/swagger-output.json";
 const endpointsFiles = ["../server.js"];
 

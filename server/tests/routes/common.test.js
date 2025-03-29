@@ -1,8 +1,9 @@
+import fs from "fs";
 import request from "supertest";
 import server from "#server/server.js";
-import fs from "fs";
-import { expressOptions } from "#server/env.js";
 import nunjucks from "nunjucks";
+import { expect } from "@jest/globals";
+import { expressOptions } from "#server/env.js";
 
 describe("Common routes:", () => {
   describe("- test route to verify that server is running", () => {
@@ -13,6 +14,7 @@ describe("Common routes:", () => {
       expect(response.text).toEqual(JSON.stringify({ message: "test" }));
     });
   });
+
   describe("- unknown route", () => {
     test("should return 404 Not Found", async () => {
       const response = await request(server).get("/unknownUrl");
@@ -21,6 +23,7 @@ describe("Common routes:", () => {
       expect(response.text).toEqual(JSON.stringify({ message: "Resource is not Found" }));
     });
   });
+
   describe("- json swagger doc route", () => {
     test("should return json swagger doc", async () => {
       const swaggerDocs = fs.readFileSync("./docs/swagger-output.json", "utf8");
@@ -30,6 +33,7 @@ describe("Common routes:", () => {
       expect(response.text).toEqual(JSON.stringify(JSON.parse(swaggerDocs)));
     });
   });
+
   describe("- redirect to root api route", () => {
     test("should redirect to api/v1/", async () => {
       const response = await request(server).get("/");
@@ -38,6 +42,7 @@ describe("Common routes:", () => {
       expect(response.headers.location).toEqual(`/api/v1/`);
     });
   });
+
   describe("- greeting api page", () => {
     test("should return greeting HTML page", async () => {
       const response = await request(server).get("/api/v1/");
