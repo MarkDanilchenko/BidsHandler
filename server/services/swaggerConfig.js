@@ -80,6 +80,50 @@ const docConfig = {
           },
         },
       },
+      RequestSignInSchema: {
+        type: "object",
+        required: ["password"],
+        oneOf: [
+          {
+            required: ["username"],
+            properties: {
+              username: {
+                type: "string",
+                example: "John_Doe",
+                description: "Users username",
+              },
+            },
+          },
+          {
+            required: ["email"],
+            properties: {
+              email: {
+                type: "string",
+                example: "QKx0o@example.com",
+                description: "Users email",
+              },
+            },
+          },
+        ],
+        properties: {
+          password: {
+            type: "string",
+            example: "12345678",
+            description: "Users password",
+          },
+        },
+      },
+      ResponseSuccessfulAuthenticationSchema: {
+        type: "object",
+        required: ["accessToken"],
+        properties: {
+          accessToken: {
+            type: "string",
+            example: "eyJhbGciOiJIUz...",
+            description: "Access token",
+          },
+        },
+      },
       Response400Schema: {
         type: "object",
         required: ["message"],
@@ -87,6 +131,28 @@ const docConfig = {
           message: {
             type: "string",
             example: "Bad Request",
+            description: "Error message",
+          },
+        },
+      },
+      Response401Schema: {
+        type: "object",
+        required: ["message"],
+        properties: {
+          message: {
+            type: "string",
+            example: "Unauthorized!",
+            description: "Error message",
+          },
+        },
+      },
+      Response404Schema: {
+        type: "object",
+        required: ["message"],
+        properties: {
+          message: {
+            type: "string",
+            example: "Not found!",
             description: "Error message",
           },
         },

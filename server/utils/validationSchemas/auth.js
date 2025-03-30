@@ -31,4 +31,21 @@ const signupSchema = z.object({
     .optional(), // files are validated via server/services/multerConfig.js
 });
 
-export { signupSchema };
+const signinSchema = z.object({
+  body: z
+    .object({
+      username: z.string().optional(),
+      email: z.string().email().optional(),
+      password: z.string().min(8),
+    })
+    .refine(
+      (data) => {
+        return data.username || data.email;
+      },
+      {
+        message: "Username or email is required.",
+      },
+    ),
+});
+
+export { signupSchema, signinSchema };
