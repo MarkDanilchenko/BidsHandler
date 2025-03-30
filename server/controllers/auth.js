@@ -1,7 +1,9 @@
-import { badRequestError } from "../utils/errors.js";
-import { User } from "../models/index.js";
+import { badRequestError, notFoundError, unauthorizedError } from "../utils/errors.js";
+import { Jwt, User } from "../models/index.js";
 import { Op } from "sequelize";
+import { expressOptions } from "../env.js";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 
 class AuthController {
   async signup(req, res) {
@@ -67,6 +69,108 @@ class AuthController {
       });
 
       res.sendStatus(201);
+      res.end();
+    } catch (error) {
+      badRequestError(res, error.message);
+    }
+  }
+
+  async signin(req, res) {
+    /*
+    #swagger.tags = ['Reg&Auth']
+    #swagger.summary = 'Sign in end-point.'
+    #swagger.description = 'This is the end-point to signin in the system.'
+    #swagger.operationId = 'signin'
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/RequestSignInSchema"
+          }
+        }
+      }
+    }
+    #swagger.responses[200] = {
+      description: 'OK',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/ResponseSuccessfulAuthenticationSchema'
+          }
+        }
+      }
+    },
+    #swagger.responses[401] = {
+      description: 'Unauthorized',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response401Schema'
+          }
+        }
+      }
+    }
+      #swagger.responses[404] = {
+      description: 'Not Found',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response404Schema'
+          }
+        }
+      }
+    }
+     */
+    try {
+      const { username, email, password } = req.body;
+
+      const searchCondition = username ? { username } : { email };
+      const user = await User.findOne({
+        where: searchCondition,
+      });
+      if (!user) {
+        return notFoundError(res, "User not found!");
+      }
+
+      const checkPassword = crypto.createHash("sha256").update(password).digest("hex") === user.password;
+      if (!checkPassword) {
+        return unauthorizedError(res, "Wrong password!");
+      }
+
+      const accessToken = jwt.sign({ userId: user.id }, expressOptions.jwtSecret, {
+        expiresIn: expressOptions.jwtAccessExpiresIn,
+      });
+      const refreshToken = jwt.sign({ userId: user.id }, expressOptions.jwtSecret, {
+        expiresIn: expressOptions.jwtRefreshExpiresIn,
+      });
+
+      const relatedRefreshToken = await Jwt.findOne({
+        where: {
+          userId: user.id,
+        },
+      });
+
+      if (relatedRefreshToken) {
+        await Jwt.update(
+          {
+            refresh_token: refreshToken,
+          },
+          {
+            where: {
+              userId: user.id,
+            },
+          },
+        );
+      } else {
+        await Jwt.create({
+          userId: user.id,
+          refresh_token: refreshToken,
+        });
+      }
+
+      res.status(200);
+      res.send(JSON.stringify({ accessToken }));
       res.end();
     } catch (error) {
       badRequestError(res, error.message);

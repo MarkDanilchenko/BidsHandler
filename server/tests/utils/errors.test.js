@@ -2,14 +2,14 @@ import { badRequestError, notFoundError, unauthorizedError } from "#server/utils
 import { jest } from "@jest/globals";
 
 describe("Response errors:", () => {
+  const res = {
+    status: jest.fn(),
+    send: jest.fn(),
+    end: jest.fn(),
+  };
+
   describe("- badRequestError", () => {
     test("should return a 400 status code and a JSON response with a message", () => {
-      const res = {
-        status: jest.fn(),
-        send: jest.fn(),
-        end: jest.fn(),
-      };
-
       badRequestError(res, "User is already registered!");
 
       expect(res.status).toHaveBeenCalled();
@@ -21,12 +21,6 @@ describe("Response errors:", () => {
   });
   describe("- notFoundError", () => {
     test("should return a 404 status code and a JSON response with a message", () => {
-      const res = {
-        status: jest.fn(),
-        send: jest.fn(),
-        end: jest.fn(),
-      };
-
       notFoundError(res, "User not found!");
 
       expect(res.status).toHaveBeenCalled();
@@ -38,12 +32,6 @@ describe("Response errors:", () => {
   });
   describe("- unauthorizedError", () => {
     test("should return a 401 status code and a JSON response with a message", () => {
-      const res = {
-        status: jest.fn(),
-        send: jest.fn(),
-        end: jest.fn(),
-      };
-
       unauthorizedError(res, "Not authorized!");
 
       expect(res.status).toHaveBeenCalled();
