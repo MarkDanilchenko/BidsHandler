@@ -4,6 +4,7 @@ import { Op } from "sequelize";
 import { expressOptions } from "../env.js";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { expressOptions } from "../env.js";
 
 class AuthController {
   async signup(req, res) {
