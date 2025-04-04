@@ -3,6 +3,18 @@ import fs from "fs";
 import logger from "#server/services/loggerConfig.js";
 import { badRequestError } from "#server/utils/errors.js";
 
+/**
+ * Returns a middleware that validates the request data with the given Zod schema.
+ *
+ * It will call the next middleware in the chain if the data is valid.
+ * If the data is invalid, it will return a 400 Bad Request response with
+ * the error message.
+ *
+ * If the request contains files, it will delete all of them in case of an error.
+ *
+ * @param {z.ZodObject} schema The Zod schema to validate the request data with.
+ * @returns {Function} The middleware function.
+ */
 function validateRequest(schema) {
   return (req, res, next) => {
     try {

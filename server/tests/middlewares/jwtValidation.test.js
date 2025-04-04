@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { jest } from "@jest/globals";
+import { expect, jest } from "@jest/globals";
 import { expressOptions } from "#server/env.js";
 import validateJwt from "#server/middleware/jwtValidation.js";
 
@@ -9,8 +9,8 @@ describe("JWT middleware validation:", () => {
 
   beforeEach(() => {
     res = {
-      status: jest.fn(),
-      send: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn().mockReturnThis(),
       end: jest.fn(),
     };
     next = jest.fn();
