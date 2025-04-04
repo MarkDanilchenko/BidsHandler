@@ -1,9 +1,8 @@
-import { badRequestError, notFoundError, unauthorizedError } from "../utils/errors.js";
-import { Jwt, User } from "../models/index.js";
-import { Op } from "sequelize";
-import { expressOptions } from "../env.js";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { Op } from "sequelize";
+import { badRequestError, notFoundError, unauthorizedError } from "../utils/errors.js";
+import { Jwt, User } from "../models/index.js";
 import { expressOptions } from "../env.js";
 
 class AuthController {
@@ -176,6 +175,70 @@ class AuthController {
     } catch (error) {
       badRequestError(res, error.message);
     }
+  }
+
+  async signout(req, res) {
+    /*
+    #swagger.tags = ['Reg&Auth']
+    #swagger.summary = 'Sign out end-point.'
+    #swagger.description = 'This is the end-point to sign out in the system and remove their refresh tokens permanently.'
+    #swagger.operationId = 'signout'
+    #swagger.security = [{"bearerAuth": []}]
+    #swagger.responses[200] = {
+      description: 'OK',
+    }
+    #swagger.responses[400] = {
+      description: 'Bad Request',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response400Schema'
+          }
+        }
+      }
+    }
+    $swagger.responses[404] = {
+      description: 'Not Found',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response404Schema'
+          }
+        }
+      }
+    }
+     */
+    try {
+      const accessToken = req.headers.authorization.split(" ")[1];
+
+      const { userId } = jwt.decode(accessToken);
+
+      const user = await User.findOne({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!user) {
+        return notFoundError(res, "User not found!");
+      }
+
+      await Jwt.destroy({
+        where: {
+          userId: user.id,
+        },
+      });
+
+      res.sendStatus(200);
+      res.end();
+    } catch (error) {
+      badRequestError(res, error.message);
+    }
+  }
+
+  async refresh(req, res) {
+    try {
+    } catch (error) {}
   }
 }
 

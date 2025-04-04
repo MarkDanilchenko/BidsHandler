@@ -15,7 +15,7 @@ import { badRequestError } from "#server/utils/errors.js";
  * @param {z.ZodObject} schema The Zod schema to validate the request data with.
  * @returns {Function} The middleware function.
  */
-function validateRequest(schema) {
+export default function validateRequest(schema) {
   return (req, res, next) => {
     try {
       schema.parse({
@@ -44,5 +44,3 @@ function validateRequest(schema) {
     }
   };
 }
-
-export { validateRequest };

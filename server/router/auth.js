@@ -1,6 +1,7 @@
 import express from "express";
 import { uploadAvatar } from "../services/multerConfig.js";
-import { validateRequest } from "../middleware/requestValidation.js";
+import validateRequest from "../middleware/requestValidation.js";
+import validateJwt from "../middleware/jwtValidation.js";
 import authController from "../controllers/auth.js";
 import { signinSchema, signupSchema } from "../utils/validationSchemas/auth.js";
 
@@ -13,7 +14,7 @@ router.post(
   authController.signup,
 );
 router.get("/signin", validateRequest(signinSchema), authController.signin);
-router.post("/signout");
+router.post("/signout", validateJwt, authController.signout);
 router.post("/refresh");
 
 export default router;

@@ -1,4 +1,4 @@
-import { validateRequest } from "#server/middleware/requestValidation.js";
+import validateRequest from "#server/middleware/requestValidation.js";
 import { expect, jest } from "@jest/globals";
 import { z } from "zod";
 import fs from "fs";
