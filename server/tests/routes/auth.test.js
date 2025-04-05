@@ -1,10 +1,13 @@
 import fs from "fs";
 import request from "supertest";
-import server from "#server/server.js";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, jest } from "@jest/globals";
 import { createFakeUser } from "#server/tests/fixtures/user.js";
 import { sequelizeConnection, User, Jwt } from "#server/models/index.js";
+import { v4 as uuidv4 } from "uuid";
+import { badRequestError, notFoundError, unauthorizedError } from "#server/utils/errors.js";
+import { response } from "express";
 
 describe("Auth routes:", () => {
   beforeAll(async () => {
@@ -15,221 +18,106 @@ describe("Auth routes:", () => {
     await sequelizeConnection.close();
   });
 
-  describe("- signup:", () => {
-    let user;
-    let avatar;
+  describe("- signout:", () => {
+    let mockJwtDestroy;
     let mockUserFindOne;
-    let mockUserCreate;
-
-    beforeAll(() => {
-      user = createFakeUser();
-    });
-
-    beforeEach(() => {
-      avatar = fs.createReadStream("./assets/IMG/avatar.png");
-
-      mockUserFindOne = jest.spyOn(User, "findOne");
-      mockUserCreate = jest.spyOn(User, "create").mockImplementation(() => true);
-    });
-
-    afterEach(() => {
-      jest.restoreAllMocks();
-    });
-
-    test("should create a new user in the system and return 201 status code", async () => {
-      mockUserFindOne.mockResolvedValue(false);
-
-      const response = await request(server)
-        .post("/api/v1/auth/signup")
-        .set({ "Content-Type": "multipart/form-data" })
-        .field("username", user.username)
-        .field("firstName", user.firstName)
-        .field("lastName", user.lastName)
-        .field("email", user.email)
-        .field("password", user.password)
-        .field("gender", user.gender)
-        .field("isAdmin", user.isAdmin)
-        .attach("avatar", avatar);
-
-      expect(mockUserFindOne).toHaveBeenCalledTimes(1);
-      expect(mockUserCreate).toHaveBeenCalledTimes(1);
-      expect(response.statusCode).toBe(201);
-    });
-
-    test("should return JSON response with message, if request data (for this example: username) is invalid, and 400 status code", async () => {
-      const response = await request(server)
-        .post("/api/v1/auth/signup")
-        .set({ "Content-Type": "multipart/form-data" })
-        .field("username", user.username.slice(0, 5) + "=<>!?")
-        .field("firstName", user.firstName)
-        .field("lastName", user.lastName)
-        .field("email", user.email)
-        .field("password", user.password)
-        .field("gender", user.gender)
-        .field("isAdmin", user.isAdmin)
-        .attach("avatar", avatar);
-
-      expect(mockUserFindOne).toHaveBeenCalledTimes(0);
-      expect(mockUserCreate).toHaveBeenCalledTimes(0);
-      expect(response.text).toEqual(
-        JSON.stringify({
-          message: {
-            validation: "regex",
-            code: "invalid_string",
-            message: "Invalid",
-            path: ["body", "username"],
-          },
-        }),
-      );
-      expect(response.statusCode).toBe(400);
-    });
-
-    test("should return JSON response with message, if user with provided email or username is already registered, and 400 status code", async () => {
-      mockUserFindOne.mockResolvedValue(true);
-
-      const response = await request(server)
-        .post("/api/v1/auth/signup")
-        .set({ "Content-Type": "multipart/form-data" })
-        .field("username", user.username)
-        .field("firstName", user.firstName)
-        .field("lastName", user.lastName)
-        .field("email", user.email)
-        .field("password", user.password)
-        .field("gender", user.gender)
-        .field("isAdmin", user.isAdmin)
-        .attach("avatar", avatar);
-
-      expect(mockUserFindOne).toHaveBeenCalledTimes(1);
-      expect(mockUserCreate).toHaveBeenCalledTimes(0);
-      expect(response.text).toEqual(
-        JSON.stringify({
-          message: "User already exists",
-        }),
-      );
-      expect(response.statusCode).toBe(400);
-    });
-  });
-
-  describe("- signin:", () => {
-    let user;
-    let hashedPassword;
-    let mockJwtFindOne;
-    let mockJwtCreate;
-    let mockJwtUpdate;
-
-    beforeAll(() => {
-      // Create fake user without avatar;
-      user = createFakeUser();
-      hashedPassword = crypto.createHash("sha256").update(user.password).digest("hex");
-    });
+    let userId = uuidv4();
+    let server;
 
     beforeEach(async () => {
-      await User.create({
-        username: user.username,
-        first_name: user.firstName,
-        last_name: user.lastName,
-        email: user.email,
-        password: hashedPassword,
-        gender: user.gender,
-        isAdmin: user.isAdmin,
-      });
+      mockJwtDestroy = jest.spyOn(Jwt, "destroy");
+      jest.spyOn(jwt, "decode").mockImplementation((accessToken) => {
+        if (accessToken !== "validAccessToken") {
+          return null;
+        }
 
-      mockJwtFindOne = jest.spyOn(Jwt, "findOne");
-      mockJwtCreate = jest.spyOn(Jwt, "create");
-      mockJwtUpdate = jest.spyOn(Jwt, "update");
+        return { userId };
+      });
+      jest.unstable_mockModule("#server/middleware/jwtValidation.js", () => ({
+        default: jest.fn((req, res, next) => {
+          const bearer = req.headers.authorization;
+
+          if (!bearer || bearer.split(" ")[1] !== "validAccessToken") {
+            return unauthorizedError(res, "Access token not found!");
+          }
+
+          next();
+        }),
+      }));
+      server = (await import("#server/server.js")).default;
     });
 
     afterEach(async () => {
       jest.restoreAllMocks();
+      jest.clearAllMocks();
+    });
 
-      await User.destroy({
-        where: {
-          username: user.username,
-        },
-        force: true,
+    test("should find jwt record by user id and delete it, return 200 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return {
+          id: options.where.id,
+        };
       });
-    });
-
-    test("should return access token and 200 status code if authentication succeed. Jwt refresh token should be created", async () => {
-      mockJwtFindOne.mockResolvedValue(false);
 
       const response = await request(server)
-        .get("/api/v1/auth/signin")
+        .post("/api/v1/auth/signout")
         .set({ "Content-Type": "application/json" })
-        .send({
-          username: user.username,
-          password: user.password,
-        });
+        .set({ Authorization: `Bearer validAccessToken` });
 
-      expect(mockJwtFindOne).toHaveBeenCalledTimes(1);
-      expect(mockJwtCreate).toHaveBeenCalledTimes(1);
-      expect(mockJwtUpdate).toHaveBeenCalledTimes(0);
-      expect(response.text).toEqual(expect.stringContaining('"accessToken":'));
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith({ id: userId });
+      expect(mockJwtDestroy).toHaveBeenCalledWith({ where: { userId } });
       expect(response.statusCode).toBe(200);
     });
 
-    test("should return access token and 200 status code if authentication succeed. Jwt refresh token should be updated", async () => {
-      mockJwtFindOne.mockResolvedValue(true);
+    test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return null;
+      });
 
       const response = await request(server)
-        .get("/api/v1/auth/signin")
+        .post("/api/v1/auth/signout")
         .set({ "Content-Type": "application/json" })
-        .send({
-          username: user.username,
-          password: user.password,
-        });
+        .set({ Authorization: `Bearer validAccessToken` });
 
-      expect(mockJwtFindOne).toHaveBeenCalledTimes(1);
-      expect(mockJwtCreate).toHaveBeenCalledTimes(0);
-      expect(mockJwtUpdate).toHaveBeenCalledTimes(1);
-      expect(response.text).toEqual(expect.stringContaining('"accessToken":'));
-      expect(response.statusCode).toBe(200);
-    });
-
-    test("should return JSON response with message, if user with provided username or email is not found, and 404 status code", async () => {
-      jest.spyOn(User, "findOne").mockResolvedValue(false);
-
-      const response = await request(server)
-        .get("/api/v1/auth/signin")
-        .set({ "Content-Type": "application/json" })
-        .send({
-          username: user.username,
-          password: user.password,
-        });
-
-      expect(mockJwtFindOne).toHaveBeenCalledTimes(0);
-      expect(mockJwtCreate).toHaveBeenCalledTimes(0);
-      expect(mockJwtUpdate).toHaveBeenCalledTimes(0);
-      expect(response.text).toEqual(
-        JSON.stringify({
-          message: "User not found!",
-        }),
-      );
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith(null);
+      expect(mockJwtDestroy).toHaveBeenCalledTimes(0);
+      expect(response.text).toEqual(JSON.stringify({ message: "User not found!" }));
       expect(response.statusCode).toBe(404);
     });
 
-    test("should return JSON response with message, if provided password is not valid, and 401 status code", async () => {
-      const response = await request(server)
-        .get("/api/v1/auth/signin")
-        .set({ "Content-Type": "application/json" })
-        .send({
-          username: user.username,
-          password: user.password.slice(0, 5) + "=<>!?",
-        });
+    test("should return JSON response with message, if failed when destroying jwt record, and 400 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return {
+          id: options.where.id,
+        };
+      });
+      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation((options) => {
+        throw new Error("Failed when destroying jwt record!");
+      });
 
-      expect(mockJwtFindOne).toHaveBeenCalledTimes(0);
-      expect(mockJwtCreate).toHaveBeenCalledTimes(0);
-      expect(mockJwtUpdate).toHaveBeenCalledTimes(0);
-      expect(response.text).toEqual(
-        JSON.stringify({
-          message: "Wrong password!",
-        }),
-      );
-      expect(response.statusCode).toBe(401);
+      const response = await request(server)
+        .post("/api/v1/auth/signout")
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` });
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith({ id: userId });
+      expect(mockJwtDestroy).toHaveBeenCalledWith({ where: { userId } });
+      expect(response.text).toEqual(JSON.stringify({ message: "Failed when destroying jwt record!" }));
+      expect(response.statusCode).toBe(400);
     });
   });
 
-  describe("- signout:", () => {});
+  // describe("- refresh token:", () => {
+  //   test("", async () => {});
 
-  describe("- refresh token:", () => {});
+  //   test("", async () => {});
+
+  //   test("", async () => {});
+  // });
 });
