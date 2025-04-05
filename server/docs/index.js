@@ -1,13 +1,5 @@
-// --------------------------------------GENERATE DOCUMENTATION
 const documentation = {
   components: {
-    securitySchemes: {
-      bearerAuth_schema: {
-        type: "http",
-        scheme: "bearer",
-        // bearerFormat: 'JWT',
-      },
-    },
     "@schemas": {
       Request_schema: {
         type: "object",

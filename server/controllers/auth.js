@@ -96,7 +96,17 @@ class AuthController {
       content: {
         'application/json': {
           schema: {
-            $ref: '#/components/schemas/ResponseSuccessfulAuthenticationSchema'
+            $ref: '#/components/schemas/ResponseSuccessfulAuthenticationRefreshSchema'
+          }
+        }
+      }
+    },
+    #swagger.responses[400] = {
+      description: 'Bad Request',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response400Schema'
           }
         }
       }
@@ -237,8 +247,101 @@ class AuthController {
   }
 
   async refresh(req, res) {
+    /*
+    #swagger.tags = ['Reg&Auth']
+    #swagger.summary = 'Refresh of the access token end-point.'
+    #swagger.description = 'This is the end-point for the refreshing access token.'
+    #swagger.operationId = 'refresh'
+    #swagger.security = [{"bearerAuth": []}]
+    #swagger.responses[200] = {
+      description: 'OK',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/ResponseSuccessfulAuthenticationRefreshSchema'
+          }
+        }
+      }
+    },
+    #swagger.responses[400] = {
+      description: 'Bad Request',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response400Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[401] = {
+      description: 'Unauthorized',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response401Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[404] = {
+      description: 'Not Found',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response404Schema'
+          }
+        }
+      }
+    }
+    */
     try {
-    } catch (error) {}
+      const accessToken = req.headers.authorization && req.headers.authorization.split(" ")[1];
+      if (!accessToken) {
+        return unauthorizedError(res, "Access token not found!");
+      }
+
+      const { userId } = jwt.decode(accessToken);
+
+      const user = await User.findOne({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) {
+        return notFoundError(res, "User not found!");
+      }
+
+      const relatedRefreshToken = await Jwt.findOne({
+        where: {
+          userId: user.id,
+        },
+      });
+      if (!relatedRefreshToken) {
+        return unauthorizedError(res, "Refresh token not found! User is not signed in.");
+      }
+
+      jwt.verify(relatedRefreshToken.refresh_token, expressOptions.jwtSecret, async (error) => {
+        if (error) {
+          await Jwt.destroy({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          return unauthorizedError(res, "Refresh token is not valid! User is not signed in.");
+        }
+
+        const accessToken = jwt.sign({ userId: user.id }, expressOptions.jwtSecret, {
+          expiresIn: expressOptions.jwtAccessExpiresIn,
+        });
+
+        res.status(200);
+        res.send(JSON.stringify({ accessToken }));
+        res.end();
+      });
+    } catch (error) {
+      badRequestError(res, error.message);
+    }
   }
 }
 

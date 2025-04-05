@@ -26,6 +26,7 @@ describe("Auth routes:", () => {
 
     beforeEach(async () => {
       mockJwtDestroy = jest.spyOn(Jwt, "destroy");
+
       jest.spyOn(jwt, "decode").mockImplementation((accessToken) => {
         if (accessToken !== "validAccessToken") {
           return null;
@@ -33,6 +34,7 @@ describe("Auth routes:", () => {
 
         return { userId };
       });
+
       jest.unstable_mockModule("#server/middleware/jwtValidation.js", () => ({
         default: jest.fn((req, res, next) => {
           const bearer = req.headers.authorization;
@@ -44,6 +46,7 @@ describe("Auth routes:", () => {
           next();
         }),
       }));
+
       server = (await import("#server/server.js")).default;
     });
 

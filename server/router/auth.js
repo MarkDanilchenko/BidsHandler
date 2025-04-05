@@ -15,6 +15,6 @@ router.post(
 );
 router.get("/signin", validateRequest(signinSchema), authController.signin);
 router.post("/signout", validateJwt, authController.signout);
-router.post("/refresh");
+router.post("/refresh", authController.refresh); // presence of access token is checked in controller
 
 export default router;

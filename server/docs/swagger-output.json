@@ -104,7 +104,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ResponseSuccessfulAuthenticationSchema"
+                  "$ref": "#/components/schemas/ResponseSuccessfulAuthenticationRefreshSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response400Schema"
                 }
               }
             }
@@ -140,6 +150,111 @@
             }
           }
         }
+      }
+    },
+    "/api/v1/auth/signout": {
+      "post": {
+        "tags": [
+          "Reg&Auth"
+        ],
+        "summary": "Sign out end-point.",
+        "description": "This is the end-point to sign out in the system and remove their refresh tokens permanently.",
+        "operationId": "signout",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response400Schema"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "Reg&Auth"
+        ],
+        "summary": "Refresh of the access token end-point.",
+        "description": "This is the end-point for the   access token.",
+        "operationId": "refresh",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulAuthenticationRefreshSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response400Schema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response401Schema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response404Schema"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/v1/": {
@@ -258,7 +373,7 @@
           }
         }
       },
-      "ResponseSuccessfulAuthenticationSchema": {
+      "ResponseSuccessfulAuthenticationRefreshSchema": {
         "type": "object",
         "required": [
           "accessToken"

@@ -113,7 +113,7 @@ const docConfig = {
           },
         },
       },
-      ResponseSuccessfulAuthenticationSchema: {
+      ResponseSuccessfulAuthenticationRefreshSchema: {
         type: "object",
         required: ["accessToken"],
         properties: {
