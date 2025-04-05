@@ -40,16 +40,12 @@ class AuthController {
       const { username, firstName, lastName, email, password, gender, isAdmin } = req.body;
       const avatar = Object.keys(req.files).length ? req.files.avatar[0].path : null;
 
-      const isUserExists = await User.findOne(
-        {
-          where: {
-            [Op.or]: [{ username }, { email }],
-          },
+      const isUserExists = await User.findOne({
+        where: {
+          [Op.or]: [{ username }, { email }],
         },
-        {
-          paranoid: false,
-        },
-      );
+        paranoid: false,
+      });
 
       if (isUserExists) {
         return badRequestError(res, "User already exists");

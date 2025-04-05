@@ -16,6 +16,8 @@ This API based on NodeJS (ExpressJS) and provides service to handle bids from us
 - PostgreSQL;
 - Sequelize;
 - Docker;
+- Jest;
+- Swagger;
 
 <div style="display: flex; justify-content: end;">
   <p>Git and Docker should be installed locally on Your PC.</p>
