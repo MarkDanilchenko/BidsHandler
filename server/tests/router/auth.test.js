@@ -6,7 +6,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, jest, tes
 import { createFakeUser } from "#server/tests/fixtures/user.js";
 import { sequelizeConnection, User, Jwt } from "#server/models/index.js";
 import { v4 as uuidv4 } from "uuid";
-import { badRequestError, notFoundError, unauthorizedError } from "#server/utils/errors.js";
+import { unauthorizedError } from "#server/utils/errors.js";
 import { expressOptions } from "#server/env.js";
 import { Op } from "sequelize";
 
@@ -17,112 +17,6 @@ describe("Auth routes:", () => {
 
   afterAll(async () => {
     await sequelizeConnection.close();
-  });
-
-  describe("- signin:", () => {
-    //   //   // let user;
-    //   //   // let hashedPassword;
-    //   //   // let mockJwtFindOne;
-    //   //   // let mockJwtCreate;
-    //   //   // let mockJwtUpdate;
-    //   //   // beforeAll(() => {
-    //   //   // // Create fake user without avatar;
-    //   //   // user = createFakeUser();
-    //   //   // hashedPassword = crypto.createHash("sha256").update(user.password).digest("hex");
-    //   //   // });
-    //   //   // beforeEach(async () => {
-    //   //   // await User.create({
-    //   //   // username: user.username,
-    //   //   // first_name: user.firstName,
-    //   //   // last_name: user.lastName,
-    //   //   // email: user.email,
-    //   //   // password: hashedPassword,
-    //   //   // gender: user.gender,
-    //   //   // isAdmin: user.isAdmin,
-    //   //   // });
-    //   //   // mockJwtFindOne = jest.spyOn(Jwt, "findOne");
-    //   //   // mockJwtCreate = jest.spyOn(Jwt, "create");
-    //   //   // mockJwtUpdate = jest.spyOn(Jwt, "update");
-    //   //   // });
-    //   //   // afterEach(async () => {
-    //   //   // jest.restoreAllMocks();
-    //   //   // await User.destroy({
-    //   //   // where: {
-    //   //   // username: user.username,
-    //   //   // },
-    //   //   // force: true,
-    //   //   // });
-    //   //   // });
-    test("should return access token and 200 status code if authentication succeed. Jwt refresh token should be created", async () => {
-      //     //   // mockJwtFindOne.mockResolvedValue(false);
-      //     //   // const response = await request(server)
-      //     //   // .get("/api/v1/auth/signin")
-      //     //   // .set({ "Content-Type": "application/json" })
-      //     //   // .send({
-      //     //   // username: user.username,
-      //     //   // password: user.password,
-      //     //   // });
-      //     //   // expect(mockJwtFindOne).toHaveBeenCalledTimes(1);
-      //     //   // expect(mockJwtCreate).toHaveBeenCalledTimes(1);
-      //     //   // expect(mockJwtUpdate).toHaveBeenCalledTimes(0);
-      //     //   // expect(response.text).toEqual(expect.stringContaining('"accessToken":'));
-      //     //   // expect(response.statusCode).toBe(200);
-    });
-
-    test("should return access token and 200 status code if authentication succeed. Jwt refresh token should be updated", async () => {
-      //     //   // mockJwtFindOne.mockResolvedValue(true);
-      //     //   // const response = await request(server)
-      //     //   // .get("/api/v1/auth/signin")
-      //     //   // .set({ "Content-Type": "application/json" })
-      //     //   // .send({
-      //     //   // username: user.username,
-      //     //   // password: user.password,
-      //     //   // });
-      //     //   // expect(mockJwtFindOne).toHaveBeenCalledTimes(1);
-      //     //   // expect(mockJwtCreate).toHaveBeenCalledTimes(0);
-      //     //   // expect(mockJwtUpdate).toHaveBeenCalledTimes(1);
-      //     //   // expect(response.text).toEqual(expect.stringContaining('"accessToken":'));
-      //     //   // expect(response.statusCode).toBe(200);
-    });
-
-    test("should return JSON response with message, if user with provided username or email is not found, and 404 status code", async () => {
-      //     //   // jest.spyOn(User, "findOne").mockResolvedValue(false);
-      //     //   // const response = await request(server)
-      //     //   // .get("/api/v1/auth/signin")
-      //     //   // .set({ "Content-Type": "application/json" })
-      //     //   // .send({
-      //     //   // username: user.username,
-      //     //   // password: user.password,
-      //     //   // });
-      //     //   // expect(mockJwtFindOne).toHaveBeenCalledTimes(0);
-      //     //   // expect(mockJwtCreate).toHaveBeenCalledTimes(0);
-      //     //   // expect(mockJwtUpdate).toHaveBeenCalledTimes(0);
-      //     //   // expect(response.text).toEqual(
-      //     //   // JSON.stringify({
-      //     //   // message: "User not found!",
-      //     //   // }),
-      //     //   // );
-      //     //   // expect(response.statusCode).toBe(404);
-    });
-
-    test("should return JSON response with message, if provided password is not valid, and 401 status code", async () => {
-      //     //   // const response = await request(server)
-      //     //   // .get("/api/v1/auth/signin")
-      //     //   // .set({ "Content-Type": "application/json" })
-      //     //   // .send({
-      //     //   // username: user.username,
-      //     //   // password: user.password.slice(0, 5) + "=<>!?",
-      //     //   // });
-      //     //   // expect(mockJwtFindOne).toHaveBeenCalledTimes(0);
-      //     //   // expect(mockJwtCreate).toHaveBeenCalledTimes(0);
-      //     //   // expect(mockJwtUpdate).toHaveBeenCalledTimes(0);
-      //     //   // expect(response.text).toEqual(
-      //     //   // JSON.stringify({
-      //     //   // message: "Wrong password!",
-      //     //   // }),
-      //     //   // );
-      //     //   // expect(response.statusCode).toBe(401);
-    });
   });
 
   describe("- signout:", () => {
@@ -203,7 +97,7 @@ describe("Auth routes:", () => {
       expect(response.statusCode).toBe(404);
     });
 
-    test("should return JSON response with message, if failed when destroying jwt record, and 400 status code", async () => {
+    test("should return JSON response with message, if destroying jwt record or smth else throws error, and 400 status code", async () => {
       mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
         return {
           id: options.where.id,
@@ -383,6 +277,22 @@ describe("Auth routes:", () => {
       expect(response.text).toEqual(JSON.stringify({ message: "Refresh token is not valid! User is not signed in." }));
       expect(response.statusCode).toBe(401);
     });
+
+    test("should return JSON response with message, if jwt decode or smth else throws an error, and 400 status code", async () => {
+      jest.spyOn(jwt, "decode").mockImplementation(() => {
+        throw new Error("Smth goes wrong");
+      });
+
+      const response = await request(server)
+        .post("/api/v1/auth/refresh")
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer expiredAccessToken` });
+
+      expect(jwt.decode).toHaveBeenCalledWith("expiredAccessToken");
+      expect(jwt.decode).toThrow(new Error("Smth goes wrong"));
+      expect(response.text).toEqual(JSON.stringify({ message: "Smth goes wrong" }));
+      expect(response.statusCode).toBe(400);
+    });
   });
 
   describe("- signup:", () => {
@@ -499,6 +409,240 @@ describe("Auth routes:", () => {
           message: "User already exists",
         }),
       );
+      expect(response.statusCode).toBe(400);
+    });
+
+    test("should return JSON response with message, if smth goes wrong, and 400 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return false;
+      });
+
+      mockUserCreate = jest.spyOn(User, "create").mockImplementation((options) => {
+        throw new Error("Smth goes wrong");
+      });
+
+      const response = await request(server)
+        .post("/api/v1/auth/signup")
+        .set({ "Content-Type": "multipart/form-data" })
+        .field("username", user.username)
+        .field("firstName", user.firstName)
+        .field("lastName", user.lastName)
+        .field("email", user.email)
+        .field("password", user.password)
+        .field("gender", user.gender)
+        .field("isAdmin", user.isAdmin)
+        .attach("avatar", avatar);
+
+      expect(mockUserFindOne).toHaveBeenCalledWith({
+        where: {
+          [Op.or]: [{ username: user.username }, { email: user.email }],
+        },
+        paranoid: false,
+      });
+      expect(mockUserFindOne).toHaveReturnedWith(false);
+      expect(mockUserCreate).toHaveBeenCalled();
+      expect(response.text).toEqual(JSON.stringify({ message: "Smth goes wrong" }));
+      expect(response.statusCode).toBe(400);
+    });
+  });
+
+  describe("- signin:", () => {
+    let user;
+    let hashedPassword;
+    let mockUserFindOne;
+    let mockJwtFindOne;
+    let mockJwtCreate;
+    let mockJwtUpdate;
+    let mockJwtSign;
+    let server;
+    let userId;
+
+    beforeEach(async () => {
+      user = createFakeUser();
+      userId = uuidv4();
+      hashedPassword = crypto.createHash("sha256").update(user.password).digest("hex");
+
+      server = (await import("#server/server.js")).default;
+    });
+
+    afterEach(async () => {
+      jest.resetAllMocks();
+      jest.clearAllMocks();
+    });
+
+    test("should return access token and 200 status code if authentication succeed. Related refresh token should be created accordingly", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        if (options.where.username === user.username || options.where.email === user.email) {
+          return { ...user, id: userId, password: hashedPassword };
+        }
+      });
+
+      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation((options) => {
+        return null;
+      });
+
+      mockJwtCreate = jest.spyOn(Jwt, "create").mockImplementation((options) => {
+        return;
+      });
+
+      const response = await request(server)
+        .get("/api/v1/auth/signin")
+        .set({ "Content-Type": "application/json" })
+        .send({
+          username: user.username,
+          password: user.password,
+        });
+
+      expect(mockUserFindOne).toHaveBeenCalledWith({
+        where: {
+          username: user.username,
+        },
+      });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        ...user,
+        id: userId,
+        password: hashedPassword,
+      });
+      expect(mockJwtFindOne).toHaveBeenCalled();
+      expect(mockJwtFindOne).toHaveReturnedWith(null);
+      expect(mockJwtCreate).toHaveBeenCalled();
+      expect(response.text).toEqual(expect.stringContaining('"accessToken":'));
+      expect(response.statusCode).toBe(200);
+    });
+
+    test("should return access token and 200 status code if authentication succeed. Jwt refresh token should be updated", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        if (options.where.username === user.username || options.where.email === user.email) {
+          return { ...user, id: userId, password: hashedPassword };
+        }
+      });
+
+      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation((options) => {
+        return true;
+      });
+
+      mockJwtCreate = jest.spyOn(Jwt, "create").mockImplementation((options) => {
+        return;
+      });
+
+      mockJwtUpdate = jest.spyOn(Jwt, "update").mockImplementation((options) => {
+        return;
+      });
+
+      const response = await request(server)
+        .get("/api/v1/auth/signin")
+        .set({ "Content-Type": "application/json" })
+        .send({
+          username: user.username,
+          password: user.password,
+        });
+
+      expect(mockUserFindOne).toHaveBeenCalledWith({
+        where: {
+          username: user.username,
+        },
+      });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        ...user,
+        id: userId,
+        password: hashedPassword,
+      });
+      expect(mockJwtFindOne).toHaveBeenCalled();
+      expect(mockJwtFindOne).toBeTruthy();
+      expect(mockJwtCreate).not.toHaveBeenCalled();
+      expect(mockJwtUpdate).toHaveBeenCalled();
+      expect(response.text).toEqual(expect.stringContaining('"accessToken":'));
+      expect(response.statusCode).toBe(200);
+    });
+
+    test("should return JSON response with message, if user with provided username or email is not found, and 404 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return null;
+      });
+
+      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation((options) => {
+        return;
+      });
+
+      const response = await request(server)
+        .get("/api/v1/auth/signin")
+        .set({ "Content-Type": "application/json" })
+        .send({
+          username: user.username,
+          password: user.password,
+        });
+
+      expect(mockUserFindOne).toHaveBeenCalledWith({
+        where: {
+          username: user.username,
+        },
+      });
+      expect(mockUserFindOne).toHaveReturnedWith(null);
+      expect(mockJwtFindOne).not.toHaveBeenCalled();
+      expect(response.text).toEqual(JSON.stringify({ message: "User not found!" }));
+      expect(response.statusCode).toBe(404);
+    });
+
+    test("should return JSON response with message, if provided password is not valid, and 401 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        if (options.where.username === user.username || options.where.email === user.email) {
+          return { ...user, id: userId, password: hashedPassword };
+        }
+      });
+
+      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation((options) => {
+        return;
+      });
+
+      const response = await request(server)
+        .get("/api/v1/auth/signin")
+        .set({ "Content-Type": "application/json" })
+        .send({
+          username: user.username,
+          password: "wrongPassword",
+        });
+
+      expect(mockUserFindOne).toHaveBeenCalledWith({
+        where: {
+          username: user.username,
+        },
+      });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        ...user,
+        id: userId,
+        password: hashedPassword,
+      });
+      expect(mockJwtFindOne).not.toHaveBeenCalled();
+      expect(response.text).toEqual(JSON.stringify({ message: "Wrong password!" }));
+      expect(response.statusCode).toBe(401);
+    });
+
+    test("should return JSON response with message, if failed when signing jwt, and 400 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        if (options.where.username === user.username || options.where.email === user.email) {
+          return { ...user, id: userId, password: hashedPassword };
+        }
+      });
+
+      mockJwtSign = jest.spyOn(jwt, "sign").mockImplementation((options) => {
+        throw new Error("Failed when signing jwt!");
+      });
+
+      const response = await request(server)
+        .get("/api/v1/auth/signin")
+        .set({ "Content-Type": "application/json" })
+        .send({
+          username: user.username,
+          password: user.password,
+        });
+
+      expect(mockUserFindOne).toHaveBeenCalledWith({
+        where: {
+          username: user.username,
+        },
+      });
+      expect(jwt.sign).toHaveBeenCalled();
+      expect(response.text).toEqual(JSON.stringify({ message: "Failed when signing jwt!" }));
       expect(response.statusCode).toBe(400);
     });
   });
