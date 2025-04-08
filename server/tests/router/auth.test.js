@@ -211,8 +211,8 @@ describe("Auth routes:", () => {
       expect(jwt.decode).toHaveBeenCalledWith("expiredAccessToken");
       expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
       expect(mockUserFindOne).toHaveReturnedWith(null);
-      expect(response.statusCode).toBe(404);
       expect(response.text).toEqual(JSON.stringify({ message: "User not found!" }));
+      expect(response.statusCode).toBe(404);
     });
 
     test("should return JSON response with message, if there is no related refresh token in database for user, and 401 status code", async () => {
