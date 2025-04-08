@@ -97,7 +97,7 @@ describe("Auth routes:", () => {
       expect(response.statusCode).toBe(404);
     });
 
-    test("should return JSON response with message, if destroying jwt record or smth else throws error, and 400 status code", async () => {
+    test("should return JSON response with message, if destroying jwt record or smth else throws an error, and 400 status code", async () => {
       mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
         return {
           id: options.where.id,

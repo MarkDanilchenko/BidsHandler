@@ -24,6 +24,10 @@ const docConfig = {
       description: "Registration & authentication end-points",
     },
     {
+      name: "Users",
+      description: "Users' profile end-points",
+    },
+    {
       name: "Bids",
       description: "Bids end-points",
     },
@@ -121,6 +125,79 @@ const docConfig = {
             type: "string",
             example: "eyJhbGciOiJIUz...",
             description: "Access token",
+          },
+        },
+      },
+      ResponseUserProfileSchema: {
+        type: "object",
+        required: [
+          "id",
+          "username",
+          "first_name",
+          "last_name",
+          "email",
+          "gender",
+          "avatar",
+          "isAdmin",
+          "createdAt",
+          "updatedAt",
+          "deletedAt",
+        ],
+        properties: {
+          id: {
+            type: "string",
+            example: "2d77c5c4-f3d3-4723-b793-f5ba38bfe5eb",
+            description: "Users id (uuidv4)",
+          },
+          username: {
+            type: "string",
+            example: "John_Doe",
+            description: "Users username",
+          },
+          first_name: {
+            type: "string",
+            example: "John",
+            description: "Users First name",
+          },
+          last_name: {
+            type: "string",
+            example: "Doe",
+            description: "Users Last name",
+          },
+          email: {
+            type: "string",
+            example: "QKx0o@example.com",
+            description: "Users email",
+          },
+          gender: {
+            type: "string",
+            example: "male",
+            description: "Users gender",
+          },
+          avatar: {
+            type: "string",
+            example: "uploads/avatars/avatar-2d77c5c4-f3d3-4723-b793-f5ba38bfe5eb.png",
+            description: "Users avatar",
+          },
+          isAdmin: {
+            type: "boolean",
+            example: true,
+            description: "Users role",
+          },
+          createdAt: {
+            type: "string",
+            example: "2022-01-01T00:00:00.000Z",
+            description: "Users creation date",
+          },
+          updatedAt: {
+            type: "string",
+            example: "2022-01-01T00:00:00.000Z",
+            description: "Users last update date",
+          },
+          deletedAt: {
+            type: "string",
+            example: "2022-01-01T00:00:00.000Z",
+            description: "Users soft deletion date",
           },
         },
       },
