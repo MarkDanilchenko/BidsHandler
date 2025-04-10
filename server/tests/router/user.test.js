@@ -6,6 +6,8 @@ import { Op } from "sequelize";
 import { createFakeUser } from "#server/tests/fixtures/user.js";
 import { User } from "#server/models/index.js";
 import { v4 as uuidv4 } from "uuid";
+import { unauthorizedError } from "../../utils/errors.js";
+import crypto from "crypto";
 
 describe("User routes:", () => {
   beforeAll(async () => {
@@ -21,9 +23,11 @@ describe("User routes:", () => {
     let user;
     let mockUserFindOne;
     let server;
+    let hashedPassword;
 
     beforeEach(async () => {
       user = createFakeUser();
+      hashedPassword = crypto.createHash("sha256").update(user.password).digest("hex");
       jest.spyOn(jwt, "decode").mockImplementation((accessToken) => {
         if (accessToken !== "validAccessToken") {
           return null;
@@ -32,7 +36,17 @@ describe("User routes:", () => {
         return { userId };
       });
 
-      jest.unstable_mockModule("");
+      jest.unstable_mockModule("#server/middleware/jwtValidation.js", () => ({
+        default: jest.fn((req, res, next) => {
+          const bearer = req.headers.authorization;
+
+          if (!bearer || bearer.split(" ")[1] !== "validAccessToken") {
+            return unauthorizedError(res, "Access token not found!");
+          }
+
+          next();
+        }),
+      }));
 
       server = (await import("#server/server.js")).default;
     });
@@ -47,7 +61,7 @@ describe("User routes:", () => {
         return {
           ...user,
           id: options.where.id,
-          password: "hashedPassword",
+          password: hashedPassword,
         };
       });
 
@@ -57,7 +71,7 @@ describe("User routes:", () => {
         .set({ Authorization: `Bearer validAccessToken` });
 
       expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
-      expect(mockUserFindOne).toHaveBeenNthCalledWith({
+      expect(mockUserFindOne).toHaveBeenCalledWith({
         where: {
           id: userId,
         },
@@ -65,12 +79,43 @@ describe("User routes:", () => {
       expect(mockUserFindOne).toHaveReturnedWith({
         ...user,
         id: userId,
-        password: "hashedPassword",
+        password: undefined,
       });
-      expect(response.text).toEqual(JSON.stringify({ ...user, id: userId }));
+      expect(response.text).toEqual(JSON.stringify({ ...user, id: userId, password: undefined }));
       expect(response.statusCode).toBe(200);
     });
-    test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {});
-    test("should return JSON response with message, if jwt.decode or smth else throws an error, and 400 status code", async () => {});
+
+    test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return null;
+      });
+
+      const response = await request(server)
+        .get("/api/v1/user/profile")
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` });
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith(null);
+      expect(response.text).toEqual(JSON.stringify({ message: "User not found!" }));
+      expect(response.statusCode).toBe(404);
+    });
+
+    test("should return JSON response with message, if User.findOne or smth else throws an error, and 400 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        throw new Error("Failed when finding user!");
+      });
+
+      const response = await request(server)
+        .get("/api/v1/user/profile")
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` });
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(response.text).toEqual(JSON.stringify({ message: "Failed when finding user!" }));
+      expect(response.statusCode).toBe(400);
+    });
   });
 });
