@@ -38,14 +38,9 @@ const signinSchema = z.object({
       email: z.string().email().optional(),
       password: z.string().min(8),
     })
-    .refine(
-      (data) => {
-        return data.username || data.email;
-      },
-      {
-        message: "Username or email is required.",
-      },
-    ),
+    .refine((data) => data.username || data.email, {
+      message: "Username or email is required.",
+    }),
 });
 
 export { signupSchema, signinSchema };
