@@ -209,10 +209,120 @@ describe("User routes:", () => {
       expect(response.statusCode).toBe(200);
     });
 
-    test("", async () => {});
+    test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return null;
+      });
 
-    test("", async () => {});
+      mockUserUpdate = jest.spyOn(User, "update").mockImplementation((options) => {
+        return;
+      });
 
-    test("", async () => {});
+      const response = await request(server)
+        .put("/api/v1/user/profile")
+        .set({ "Content-Type": "multipart/form-data" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .field("username", user.username)
+        .field("firstName", user.firstName)
+        .field("lastName", user.lastName)
+        .field("gender", user.gender)
+        .field("isAdmin", user.isAdmin)
+        .attach("avatar", avatar);
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith(null);
+      expect(mockUserUpdate).not.toHaveBeenCalled();
+      expect(response.text).toEqual(JSON.stringify({ message: "User not found!" }));
+      expect(response.statusCode).toBe(404);
+    });
+
+    test("should return JSON response with message, if User.update or smth else throws an error, and 400 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return {
+          ...user,
+          id: options.where.id,
+          password: hashedPassword,
+          avatar: null,
+        };
+      });
+
+      mockUserUpdate = jest.spyOn(User, "update").mockImplementation((options) => {
+        throw new Error("Something went wrong!");
+      });
+
+      const response = await request(server)
+        .put("/api/v1/user/profile")
+        .set({ "Content-Type": "multipart/form-data" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .field("username", user.username)
+        .field("firstName", user.firstName)
+        .field("lastName", user.lastName)
+        .field("gender", user.gender)
+        .field("isAdmin", user.isAdmin)
+        .attach("avatar", avatar);
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        ...user,
+        id: userId,
+        password: hashedPassword,
+        avatar: null,
+      });
+      expect(mockUserUpdate).toHaveBeenCalledWith(
+        {
+          username: user.username,
+          first_name: user.firstName,
+          last_name: user.lastName,
+          gender: user.gender,
+          isAdmin: user.isAdmin ? "true" : "false",
+          avatar: expect.stringMatching(
+            /uploads\/avatars\/avatar-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.jpe?g|png$/,
+          ),
+        },
+        { where: { id: userId } },
+      );
+      expect(response.text).toEqual(JSON.stringify({ message: "Something went wrong!" }));
+      expect(response.statusCode).toBe(400);
+    });
+
+    test("should return JSON response with message, if provided data for update (for example: firstName or lastName) is not valid, and 400 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return;
+      });
+
+      mockUserUpdate = jest.spyOn(User, "update").mockImplementation((options) => {
+        return;
+      });
+
+      const response = await request(server)
+        .put("/api/v1/user/profile")
+        .set({ "Content-Type": "multipart/form-data" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .field("username", user.username)
+        .field("firstName", "invalidFirstName" + "123")
+        .field("lastName", "invalidLastName" + "456")
+        .field("gender", user.gender)
+        .field("isAdmin", user.isAdmin)
+        .attach("avatar", avatar);
+
+      expect(jwt.decode).not.toHaveBeenCalled();
+      expect(mockUserFindOne).not.toHaveBeenCalled();
+      expect(mockUserUpdate).not.toHaveBeenCalled();
+      expect(response.text).toEqual(
+        JSON.stringify({
+          message: {
+            validation: "regex",
+            code: "invalid_string",
+            message: "Invalid",
+            path: ["body", "firstName"],
+          },
+        }),
+      );
+      expect(response.statusCode).toBe(400);
+    });
   });
 });
