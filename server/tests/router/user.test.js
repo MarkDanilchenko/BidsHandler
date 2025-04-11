@@ -1,13 +1,13 @@
 import request from "supertest";
 import { sequelizeConnection } from "#server/models/index.js";
-import { afterAll, afterEach, beforeAll, describe, expect, jest, test } from "@jest/globals";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, jest, test } from "@jest/globals";
 import jwt from "jsonwebtoken";
-import { Op } from "sequelize";
 import { createFakeUser } from "#server/tests/fixtures/user.js";
 import { User } from "#server/models/index.js";
 import { v4 as uuidv4 } from "uuid";
-import { unauthorizedError } from "../../utils/errors.js";
+import { unauthorizedError } from "#server/utils/errors.js";
 import crypto from "crypto";
+import fs from "fs";
 
 describe("User routes:", () => {
   beforeAll(async () => {
@@ -22,8 +22,8 @@ describe("User routes:", () => {
     let userId = uuidv4();
     let user;
     let mockUserFindOne;
-    let server;
     let hashedPassword;
+    let server;
 
     beforeEach(async () => {
       user = createFakeUser();
@@ -41,7 +41,7 @@ describe("User routes:", () => {
           const bearer = req.headers.authorization;
 
           if (!bearer || bearer.split(" ")[1] !== "validAccessToken") {
-            return unauthorizedError(res, "Access token not found!");
+            return unauthorizedError(res, "Access token not found or is not valid!");
           }
 
           next();
@@ -71,11 +71,8 @@ describe("User routes:", () => {
         .set({ Authorization: `Bearer validAccessToken` });
 
       expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
-      expect(mockUserFindOne).toHaveBeenCalledWith({
-        where: {
-          id: userId,
-        },
-      });
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
       expect(mockUserFindOne).toHaveReturnedWith({
         ...user,
         id: userId,
@@ -96,6 +93,7 @@ describe("User routes:", () => {
         .set({ Authorization: `Bearer validAccessToken` });
 
       expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
       expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
       expect(mockUserFindOne).toHaveReturnedWith(null);
       expect(response.text).toEqual(JSON.stringify({ message: "User not found!" }));
@@ -113,9 +111,108 @@ describe("User routes:", () => {
         .set({ Authorization: `Bearer validAccessToken` });
 
       expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
       expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
       expect(response.text).toEqual(JSON.stringify({ message: "Failed when finding user!" }));
       expect(response.statusCode).toBe(400);
     });
+  });
+
+  describe("- update user profile", () => {
+    let userId = uuidv4();
+    let user;
+    let avatar;
+    let mockUserFindOne;
+    let mockUserUpdate;
+    let hashedPassword;
+    let server;
+
+    beforeEach(async () => {
+      user = createFakeUser();
+      avatar = fs.createReadStream("./assets/IMG/avatar.png");
+      hashedPassword = crypto.createHash("sha256").update(user.password).digest("hex");
+      jest.spyOn(jwt, "decode").mockImplementation((accessToken) => {
+        if (accessToken !== "validAccessToken") {
+          return null;
+        }
+
+        return { userId };
+      });
+
+      jest.unstable_mockModule("#server/middleware/jwtValidation.js", () => ({
+        default: jest.fn((req, res, next) => {
+          const bearer = req.headers.authorization;
+
+          if (!bearer || bearer.split(" ")[1] !== "validAccessToken") {
+            return unauthorizedError(res, "Access token not found or is not valid!");
+          }
+
+          next();
+        }),
+      }));
+
+      server = (await import("#server/server.js")).default;
+    });
+
+    afterEach(async () => {
+      jest.restoreAllMocks();
+      jest.clearAllMocks();
+    });
+
+    test("should return 200 OK when updated successfully", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return {
+          ...user,
+          id: options.where.id,
+          password: hashedPassword,
+          avatar: null,
+        };
+      });
+
+      mockUserUpdate = jest.spyOn(User, "update").mockImplementation((options) => {
+        return;
+      });
+
+      const response = await request(server)
+        .put("/api/v1/user/profile")
+        .set({ "Content-Type": "multipart/form-data" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .field("username", user.username)
+        .field("firstName", user.firstName)
+        .field("lastName", user.lastName)
+        .field("gender", user.gender)
+        .field("isAdmin", user.isAdmin)
+        .attach("avatar", avatar);
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        ...user,
+        id: userId,
+        password: hashedPassword,
+        avatar: null,
+      });
+      expect(mockUserUpdate).toHaveBeenCalledWith(
+        {
+          username: user.username,
+          first_name: user.firstName,
+          last_name: user.lastName,
+          gender: user.gender,
+          isAdmin: user.isAdmin ? "true" : "false",
+          avatar: expect.stringMatching(
+            /uploads\/avatars\/avatar-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.jpe?g|png$/,
+          ),
+        },
+        { where: { id: userId } },
+      );
+      expect(response.statusCode).toBe(200);
+    });
+
+    test("", async () => {});
+
+    test("", async () => {});
+
+    test("", async () => {});
   });
 });

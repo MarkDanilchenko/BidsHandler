@@ -117,6 +117,42 @@ const docConfig = {
           },
         },
       },
+      RequestUpdateProfileSchema: {
+        type: "object",
+        required: [],
+        properties: {
+          username: {
+            type: "string",
+            example: "John_Doe",
+            description: "Users username",
+          },
+          firstName: {
+            type: "string",
+            example: "John",
+            description: "Users First name",
+          },
+          lastName: {
+            type: "string",
+            example: "Doe",
+            description: "Users Last name",
+          },
+          gender: {
+            type: "string",
+            example: "male",
+            description: "Users gender",
+          },
+          isAdmin: {
+            type: "boolean",
+            example: true,
+            description: "Users role",
+          },
+          avatar: {
+            type: "string",
+            format: "binary",
+            description: "Users avatar file in multipart",
+          },
+        },
+      },
       ResponseSuccessfulAuthenticationRefreshSchema: {
         type: "object",
         required: ["accessToken"],

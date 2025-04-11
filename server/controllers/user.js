@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import { User } from "#server/models/index.js";
 import { badRequestError, notFoundError } from "../utils/errors.js";
+import fs from "fs";
+import logger from "#server/services/loggerConfig.js";
 
 class UserController {
   async retrieveProfile(req, res) {
@@ -62,7 +64,89 @@ class UserController {
       badRequestError(res, error.message);
     }
   }
-  async updateProfile(req, res) {}
+  async updateProfile(req, res) {
+    /*
+    #swagger.tags = ['Users']
+    #swagger.summary = 'Update profile end-point.'
+    #swagger.description = 'This is the end-point to update user profile.'
+    #swagger.operationId = 'updateProfile'
+    #swagger.security = [{"bearerAuth": []}]
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "multipart/form-data": {
+          schema: {
+            $ref: "#/components/schemas/RequestUpdateProfileSchema"
+          }
+        }
+      }
+    }
+    #swagger.responses[200] = {
+      description: 'OK',
+    },
+    #swagger.responses[400] = {
+      description: 'Bad Request',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response400Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[404] = {
+      description: 'Not Found',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response404Schema'
+          }
+        }
+      }
+    }
+    */
+    try {
+      const accessToken = req.headers.authorization.split(" ")[1];
+      const { username, firstName, lastName, gender, isAdmin } = req.body;
+      const avatar = Object.keys(req.files).length ? req.files.avatar[0].path : null;
+
+      const { userId } = jwt.decode(accessToken);
+
+      const user = await User.findOne({
+        where: { id: userId },
+      });
+      if (!user) {
+        return notFoundError(res, "User not found!");
+      }
+
+      const previousAvatarPath = user.avatar;
+      const options = {
+        username,
+        first_name: firstName,
+        last_name: lastName,
+        gender,
+        isAdmin,
+        avatar,
+      };
+
+      await User.update(options, {
+        where: { id: userId },
+      });
+
+      if (previousAvatarPath) {
+        fs.unlink(previousAvatarPath, (error) => {
+          if (error) {
+            logger.error(error.message);
+          }
+        });
+      }
+
+      res.status(200);
+      res.end();
+    } catch (error) {
+      badRequestError(res, error.message);
+    }
+  }
   async deleteProfile(req, res) {}
   async restoreProfile(req, res) {}
 }
