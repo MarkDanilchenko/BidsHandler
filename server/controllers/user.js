@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { User } from "#server/models/index.js";
+import { Jwt, User } from "#server/models/index.js";
 import { badRequestError, notFoundError } from "../utils/errors.js";
 import fs from "fs";
 import logger from "#server/services/loggerConfig.js";
@@ -64,6 +64,7 @@ class UserController {
       badRequestError(res, error.message);
     }
   }
+
   async updateProfile(req, res) {
     /*
     #swagger.tags = ['Users']
@@ -147,7 +148,64 @@ class UserController {
       badRequestError(res, error.message);
     }
   }
-  async deleteProfile(req, res) {}
+
+  async deleteProfile(req, res) {
+    /*
+    #swagger.tags = ['Users']
+    #swagger.summary = 'Delete profile end-point.'
+    #swagger.description = 'This is the end-point to delete user profile.'
+    #swagger.operationId = 'deleteProfile'
+    #swagger.security = [{"bearerAuth": []}]
+    #swagger.responses[200] = {
+      description: 'OK',
+    },
+    #swagger.responses[400] = {
+      description: 'Bad Request',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response400Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[404] = {
+      description: 'Not Found',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response404Schema'
+          }
+        }
+      }
+    }
+    */
+    try {
+      const accessToken = req.headers.authorization.split(" ")[1];
+      const { userId } = jwt.decode(accessToken);
+
+      const user = await User.findOne({
+        where: { id: userId },
+      });
+      if (!user) {
+        return notFoundError(res, "User not found!");
+      }
+
+      await User.destroy({
+        where: { id: userId },
+      });
+
+      await Jwt.destroy({
+        where: { userId },
+      });
+
+      res.status(200);
+      res.end();
+    } catch (error) {
+      badRequestError(res, error.message);
+    }
+  }
+
   async restoreProfile(req, res) {}
 }
 

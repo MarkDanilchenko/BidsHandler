@@ -3,7 +3,7 @@ import { sequelizeConnection } from "#server/models/index.js";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, jest, test } from "@jest/globals";
 import jwt from "jsonwebtoken";
 import { createFakeUser } from "#server/tests/fixtures/user.js";
-import { User } from "#server/models/index.js";
+import { User, Jwt } from "#server/models/index.js";
 import { v4 as uuidv4 } from "uuid";
 import { unauthorizedError } from "#server/utils/errors.js";
 import crypto from "crypto";
@@ -139,6 +139,8 @@ describe("User routes:", () => {
         return { userId };
       });
 
+      jest.spyOn(fs, "unlink").mockImplementation(jest.fn());
+
       jest.unstable_mockModule("#server/middleware/jwtValidation.js", () => ({
         default: jest.fn((req, res, next) => {
           const bearer = req.headers.authorization;
@@ -193,6 +195,7 @@ describe("User routes:", () => {
         password: hashedPassword,
         avatar: null,
       });
+      expect(fs.unlink).not.toHaveBeenCalled();
       expect(mockUserUpdate).toHaveBeenCalledWith(
         {
           username: user.username,
@@ -233,6 +236,7 @@ describe("User routes:", () => {
       expect(jwt.decode).toHaveReturnedWith({ userId });
       expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
       expect(mockUserFindOne).toHaveReturnedWith(null);
+      expect(fs.unlink).not.toHaveBeenCalled();
       expect(mockUserUpdate).not.toHaveBeenCalled();
       expect(response.text).toEqual(JSON.stringify({ message: "User not found!" }));
       expect(response.statusCode).toBe(404);
@@ -272,6 +276,7 @@ describe("User routes:", () => {
         password: hashedPassword,
         avatar: null,
       });
+      expect(fs.unlink).not.toHaveBeenCalled();
       expect(mockUserUpdate).toHaveBeenCalledWith(
         {
           username: user.username,
@@ -311,6 +316,7 @@ describe("User routes:", () => {
 
       expect(jwt.decode).not.toHaveBeenCalled();
       expect(mockUserFindOne).not.toHaveBeenCalled();
+      expect(fs.unlink).toHaveBeenCalled(); // Avatar will be deleted with the server/middleware/requestValidation.js;
       expect(mockUserUpdate).not.toHaveBeenCalled();
       expect(response.text).toEqual(
         JSON.stringify({
@@ -322,6 +328,118 @@ describe("User routes:", () => {
           },
         }),
       );
+      expect(response.statusCode).toBe(400);
+    });
+  });
+
+  describe("- delete user profile", () => {
+    let userId = uuidv4();
+    let mockUserFindOne;
+    let mockUserDestroy;
+    let mockJwtDestroy;
+    let server;
+
+    beforeEach(async () => {
+      jest.spyOn(jwt, "decode").mockImplementation((accessToken) => {
+        if (accessToken !== "validAccessToken") {
+          return null;
+        }
+
+        return { userId };
+      });
+
+      jest.unstable_mockModule("#server/middleware/jwtValidation.js", () => ({
+        default: jest.fn((req, res, next) => {
+          const bearer = req.headers.authorization;
+
+          if (!bearer || bearer.split(" ")[1] !== "validAccessToken") {
+            return unauthorizedError(res, "Access token not found or is not valid!");
+          }
+
+          next();
+        }),
+      }));
+
+      server = (await import("#server/server.js")).default;
+    });
+
+    afterEach(async () => {
+      jest.restoreAllMocks();
+      jest.clearAllMocks();
+    });
+
+    test("should destroy user profile and return 200 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return true;
+      });
+
+      mockUserDestroy = jest.spyOn(User, "destroy").mockImplementation((options) => {
+        return null;
+      });
+
+      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation((options) => {
+        return null;
+      });
+
+      const response = await request(server)
+        .delete("/api/v1/user/profile")
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` });
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith(true);
+      expect(mockUserDestroy).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserDestroy).toHaveReturnedWith(null);
+      expect(mockJwtDestroy).toHaveBeenCalledWith({ where: { userId } });
+      expect(mockJwtDestroy).toHaveReturnedWith(null);
+      expect(response.statusCode).toBe(200);
+    });
+
+    test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return null;
+      });
+
+      const response = await request(server)
+        .delete("/api/v1/user/profile")
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` });
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith(null);
+      expect(response.text).toEqual(JSON.stringify({ message: "User not found!" }));
+      expect(response.statusCode).toBe(404);
+    });
+
+    test("should return JSON response with message, if User.destroy or smth else throws an error, and 400 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return true;
+      });
+
+      mockUserDestroy = jest.spyOn(User, "destroy").mockImplementation((options) => {
+        throw new Error("Something went wrong!");
+      });
+
+      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation((options) => {
+        return null;
+      });
+
+      const response = await request(server)
+        .delete("/api/v1/user/profile")
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` });
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith(true);
+      expect(mockUserDestroy).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockJwtDestroy).not.toHaveBeenCalled();
+      expect(response.text).toEqual(JSON.stringify({ message: "Something went wrong!" }));
       expect(response.statusCode).toBe(400);
     });
   });
