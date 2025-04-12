@@ -1,4 +1,4 @@
-// webpack is used to bundle js and scss files for static greeting html page
+// webpack is used to bundle js and scss files for static greeting html page;
 
 import path from "path";
 import { fileURLToPath } from "url";

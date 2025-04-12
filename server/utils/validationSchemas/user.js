@@ -32,6 +32,16 @@ const updateUserSchema = z.object({
     .optional(), // files are validated via server/services/multerConfig.js
 });
 
-const userRestoreSchema = z.object({});
+const userRestoreSchema = z.object({
+  body: z
+    .object({
+      username: z.string().optional(),
+      email: z.string().email().optional(),
+      password: z.string().min(8),
+    })
+    .refine((data) => data.username || data.email, {
+      message: "Username or email is required!",
+    }),
+});
 
 export { updateUserSchema, userRestoreSchema };

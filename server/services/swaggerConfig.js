@@ -28,7 +28,7 @@ const docConfig = {
       description: "Users' profile end-points",
     },
     {
-      name: "Bids",
+      name: "Bids&Comments",
       description: "Bids end-points",
     },
     {
@@ -150,6 +150,39 @@ const docConfig = {
             type: "string",
             format: "binary",
             description: "Users avatar file in multipart",
+          },
+        },
+      },
+      RequestRestoreProfileSchema: {
+        type: "object",
+        required: ["password"],
+        oneOf: [
+          {
+            required: ["username"],
+            properties: {
+              username: {
+                type: "string",
+                example: "John_Doe",
+                description: "Users username",
+              },
+            },
+          },
+          {
+            required: ["email"],
+            properties: {
+              email: {
+                type: "string",
+                example: "QKx0o@example.com",
+                description: "Users email",
+              },
+            },
+          },
+        ],
+        properties: {
+          password: {
+            type: "string",
+            example: "12345678",
+            description: "Users password",
           },
         },
       },

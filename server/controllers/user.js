@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
 import { Jwt, User } from "#server/models/index.js";
-import { badRequestError, notFoundError } from "../utils/errors.js";
+import { badRequestError, notFoundError, unauthorizedError } from "../utils/errors.js";
 import fs from "fs";
 import logger from "#server/services/loggerConfig.js";
+import crypto from "crypto";
 
 class UserController {
   async retrieveProfile(req, res) {
@@ -206,7 +207,83 @@ class UserController {
     }
   }
 
-  async restoreProfile(req, res) {}
+  async restoreProfile(req, res) {
+    /*
+    #swagger.tags = ['Users']
+    #swagger.summary = 'Restore profile end-point.'
+    #swagger.description = 'This is the end-point to restore user profile.'
+    #swagger.operationId = 'restoreProfile'
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/RequestRestoreProfileSchema"
+          }
+        }
+      }
+    }
+    #swagger.responses[200] = {
+      description: 'OK',
+    },
+    #swagger.responses[400] = {
+      description: 'Bad Request',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response400Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[401] = {
+      description: 'Unauthorized',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response401Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[404] = {
+      description: 'Not Found',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response404Schema'
+          }
+        }
+      }
+    }
+    */
+    try {
+      const { username, email, password } = req.body;
+      const options = username ? { username } : { email };
+
+      const user = await User.findOne({
+        where: options,
+        paranoid: false,
+      });
+      if (!user) {
+        return notFoundError(res, "User not found!");
+      }
+
+      const checkPassword = crypto.createHash("sha256").update(password).digest("hex") === user.password;
+      if (!checkPassword) {
+        return unauthorizedError(res, "Password is not valid!");
+      }
+
+      await User.restore({
+        where: options,
+      });
+
+      res.status(200);
+      res.end();
+    } catch (error) {
+      badRequestError(res, error.message);
+    }
+  }
 }
 
 const userController = new UserController();

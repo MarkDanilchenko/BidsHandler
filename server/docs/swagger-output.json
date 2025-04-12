@@ -25,7 +25,7 @@
       "description": "Users' profile end-points"
     },
     {
-      "name": "Bids",
+      "name": "Bids&Comments",
       "description": "Bids end-points"
     },
     {
@@ -374,20 +374,104 @@
         }
       },
       "delete": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete profile end-point.",
+        "description": "This is the end-point to delete user profile.",
+        "operationId": "deleteProfile",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
           }
-        }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response400Schema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response404Schema"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/v1/user/profile/restore": {
       "patch": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Restore profile end-point.",
+        "description": "This is the end-point to restore user profile.",
+        "operationId": "restoreProfile",
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response400Schema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response401Schema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response404Schema"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestRestoreProfileSchema"
+              }
+            }
           }
         }
       }
@@ -541,6 +625,45 @@
             "type": "string",
             "format": "binary",
             "description": "Users avatar file in multipart"
+          }
+        }
+      },
+      "RequestRestoreProfileSchema": {
+        "type": "object",
+        "required": [
+          "password"
+        ],
+        "oneOf": [
+          {
+            "required": [
+              "username"
+            ],
+            "properties": {
+              "username": {
+                "type": "string",
+                "example": "John_Doe",
+                "description": "Users username"
+              }
+            }
+          },
+          {
+            "required": [
+              "email"
+            ],
+            "properties": {
+              "email": {
+                "type": "string",
+                "example": "QKx0o@example.com",
+                "description": "Users email"
+              }
+            }
+          }
+        ],
+        "properties": {
+          "password": {
+            "type": "string",
+            "example": "12345678",
+            "description": "Users password"
           }
         }
       },

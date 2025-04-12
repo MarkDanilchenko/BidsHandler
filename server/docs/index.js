@@ -1,22 +1,5 @@
 const documentation = {
   components: {
-    "@schemas": {
-      Requests_responseSchema: {
-        type: "object",
-        required: ["data", "pageInfo"],
-        properties: {
-          data: {
-            type: "array",
-            items: {
-              $ref: "#/components/schemas/Request_schema",
-            },
-          },
-          pageInfo: {
-            $ref: "#/components/schemas/PageInfo_schema",
-          },
-        },
-      },
-    },
     parameters: {
       IDInPath: {
         in: "path",

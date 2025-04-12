@@ -443,4 +443,151 @@ describe("User routes:", () => {
       expect(response.statusCode).toBe(400);
     });
   });
+
+  describe("- restore user profile", () => {
+    let userId = uuidv4();
+    let user;
+    let mockUserFindOne;
+    let mockUserRestore;
+    let hashedPassword;
+    let server;
+
+    beforeEach(async () => {
+      user = createFakeUser();
+      hashedPassword = crypto.createHash("sha256").update(user.password).digest("hex");
+
+      server = (await import("#server/server.js")).default;
+    });
+
+    afterEach(async () => {
+      jest.restoreAllMocks();
+      jest.clearAllMocks();
+    });
+
+    test("should restore user profile and return 200 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return {
+          ...user,
+          id: userId,
+          password: hashedPassword,
+          avatar: null,
+        };
+      });
+
+      mockUserRestore = jest.spyOn(User, "restore").mockImplementation((options) => {
+        return null;
+      });
+
+      const response = await request(server)
+        .patch("/api/v1/user/profile/restore")
+        .set({ "Content-Type": "application/json" })
+        .send({
+          username: user.username,
+          password: user.password,
+        });
+
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { username: user.username }, paranoid: false });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        ...user,
+        id: userId,
+        password: hashedPassword,
+        avatar: null,
+      });
+      expect(mockUserRestore).toHaveBeenCalledWith({ where: { username: user.username } });
+      expect(mockUserRestore).toHaveReturnedWith(null);
+      expect(response.statusCode).toBe(200);
+    });
+
+    test("should return JSON response with message, if user is not found with provided username or email, and 404 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return null;
+      });
+
+      mockUserRestore = jest.spyOn(User, "restore").mockImplementation((options) => {
+        return null;
+      });
+
+      const response = await request(server)
+        .patch("/api/v1/user/profile/restore")
+        .set({ "Content-Type": "application/json" })
+        .send({
+          username: user.username,
+          password: user.password,
+        });
+
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { username: user.username }, paranoid: false });
+      expect(mockUserFindOne).toHaveReturnedWith(null);
+      expect(mockUserRestore).not.toHaveBeenCalled();
+      expect(response.text).toEqual(JSON.stringify({ message: "User not found!" }));
+      expect(response.statusCode).toBe(404);
+    });
+
+    test("should return JSON response with message, if provided password is not valid, and 401 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return {
+          ...user,
+          id: userId,
+          password: hashedPassword,
+          avatar: null,
+        };
+      });
+
+      mockUserRestore = jest.spyOn(User, "restore").mockImplementation((options) => {
+        return null;
+      });
+
+      const response = await request(server)
+        .patch("/api/v1/user/profile/restore")
+        .set({ "Content-Type": "application/json" })
+        .send({
+          username: user.username,
+          password: "wrongPassword",
+        });
+
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { username: user.username }, paranoid: false });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        ...user,
+        id: userId,
+        password: hashedPassword,
+        avatar: null,
+      });
+      expect(mockUserRestore).not.toHaveBeenCalled();
+      expect(response.text).toEqual(JSON.stringify({ message: "Password is not valid!" }));
+      expect(response.statusCode).toBe(401);
+    });
+
+    test("should return JSON response with message, if User.restore or smth else throws an error, and 400 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return {
+          ...user,
+          id: userId,
+          password: hashedPassword,
+          avatar: null,
+        };
+      });
+
+      mockUserRestore = jest.spyOn(User, "restore").mockImplementation((options) => {
+        throw new Error("Something went wrong!");
+      });
+
+      const response = await request(server)
+        .patch("/api/v1/user/profile/restore")
+        .set({ "Content-Type": "application/json" })
+        .send({
+          username: user.username,
+          password: user.password,
+        });
+
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { username: user.username }, paranoid: false });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        ...user,
+        id: userId,
+        password: hashedPassword,
+        avatar: null,
+      });
+      expect(mockUserRestore).toHaveBeenCalledWith({ where: { username: user.username } });
+      expect(response.text).toEqual(JSON.stringify({ message: "Something went wrong!" }));
+      expect(response.statusCode).toBe(400);
+    });
+  });
 });
