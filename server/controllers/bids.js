@@ -1,5 +1,67 @@
+import jwt from "jsonwebtoken";
+import { Bid } from "../models/index.js";
+import { badRequestError } from "../utils/errors.js";
+
 class BidsController {
-  async createBid(req, res) {}
+  async createBid(req, res) {
+    /*
+    #swagger.tags = ['Bids&Comments']
+    #swagger.summary = 'Create bid end-point.'
+    #swagger.description = 'This is the end-point to create bid.'
+    #swagger.operationId = 'createBid'
+    #swagger.security = [{"bearerAuth": []}]
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/RequestCreateBidSchema"
+          }
+        }
+      }
+    }
+    #swagger.responses[200] = {
+      description: 'OK',
+    },
+    #swagger.responses[400] = {
+      description: 'Bad Request',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response400Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[401] = {
+      description: 'Unauthorized',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response401Schema'
+          }
+        }
+      }
+    }
+    */
+    try {
+      const accessToken = req.headers.authorization.split(" ")[1];
+      const { userId } = jwt.decode(accessToken);
+      const { message } = req.body;
+
+      const options = {
+        message,
+        authorId: userId,
+      };
+
+      await Bid.create(options);
+
+      res.sendStatus(200);
+      res.end();
+    } catch (error) {
+      badRequestError(res, error.message);
+    }
+  }
 
   async getBids(req, res) {}
 

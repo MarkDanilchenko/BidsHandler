@@ -186,6 +186,17 @@ const docConfig = {
           },
         },
       },
+      RequestCreateBidSchema: {
+        type: "object",
+        required: ["message"],
+        properties: {
+          message: {
+            type: "string",
+            example: "Bid message",
+            description: "Bid message",
+          },
+        },
+      },
       ResponseSuccessfulAuthenticationRefreshSchema: {
         type: "object",
         required: ["accessToken"],
