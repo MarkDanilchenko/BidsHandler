@@ -96,9 +96,143 @@ describe("Bids routes:", () => {
     });
   });
 
-  describe("", () => {});
+  describe("- get bids list", () => {
+    let mockBidFindAndCountAll;
+    let server;
 
-  describe("", () => {});
+    beforeEach(async () => {
+      jest.unstable_mockModule("#server/middleware/jwtValidation.js", () => ({
+        default: jest.fn((req, res, next) => {
+          const bearer = req.headers.authorization;
 
-  describe("", () => {});
+          if (!bearer || bearer.split(" ")[1] !== "validAccessToken") {
+            return unauthorizedError(res, "Access token not found or is not valid!");
+          }
+
+          next();
+        }),
+      }));
+
+      server = (await import("#server/server.js")).default;
+    });
+
+    afterEach(async () => {
+      jest.restoreAllMocks();
+      jest.clearAllMocks();
+    });
+
+    test("should return bids list and 200 status code", async () => {
+      mockBidFindAndCountAll = jest.spyOn(Bid, "findAndCountAll").mockImplementation(() => {
+        return {
+          bids: [
+            {
+              id: "f0a85187-7b03-48aa-b89e-9d8e20a429f8",
+              status: "pending",
+              message: "Culpa reiciendis eaque praesentium quo corporis quos optio voluptate nulla.",
+              authorId: "adb1167d-f532-4819-8da5-2d3987b046ee",
+              createdAt: "2025-04-14T18:29:13.963Z",
+              updatedAt: "2025-04-14T18:29:13.963Z",
+              deletedAt: null,
+            },
+          ],
+          count: 1,
+          limit: 10,
+          offset: 0,
+        };
+      });
+
+      const response = await request(server)
+        .get("/api/v1/bids/")
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .query({
+          limit: 10,
+          offset: 0,
+        });
+
+      expect(mockBidFindAndCountAll).toHaveBeenCalledWith({
+        limit: String(10),
+        offset: String(0),
+      });
+      expect(mockBidFindAndCountAll).toHaveReturnedWith({
+        bids: [
+          {
+            id: "f0a85187-7b03-48aa-b89e-9d8e20a429f8",
+            status: "pending",
+            message: "Culpa reiciendis eaque praesentium quo corporis quos optio voluptate nulla.",
+            authorId: "adb1167d-f532-4819-8da5-2d3987b046ee",
+            createdAt: "2025-04-14T18:29:13.963Z",
+            updatedAt: "2025-04-14T18:29:13.963Z",
+            deletedAt: null,
+          },
+        ],
+        count: 1,
+        limit: 10,
+        offset: 0,
+      });
+      expect(response.statusCode).toBe(200);
+    });
+
+    test("should return JSON response with message, if findAndCountAll or smth else throws an error, and 400 status code", async () => {});
+
+    test("should return JSON response with message, if npt valid data in req.query, and 400 status code", async () => {});
+  });
+
+  describe("", () => {
+    let server;
+
+    beforeEach(async () => {
+      jest.unstable_mockModule("#server/middleware/jwtValidation.js", () => ({
+        default: jest.fn((req, res, next) => {
+          const bearer = req.headers.authorization;
+
+          if (!bearer || bearer.split(" ")[1] !== "validAccessToken") {
+            return unauthorizedError(res, "Access token not found or is not valid!");
+          }
+
+          next();
+        }),
+      }));
+
+      server = (await import("#server/server.js")).default;
+    });
+
+    afterEach(async () => {
+      jest.restoreAllMocks();
+      jest.clearAllMocks();
+    });
+
+    test("", async () => {});
+
+    test("", async () => {});
+  });
+
+  describe("", () => {
+    let server;
+
+    beforeEach(async () => {
+      jest.unstable_mockModule("#server/middleware/jwtValidation.js", () => ({
+        default: jest.fn((req, res, next) => {
+          const bearer = req.headers.authorization;
+
+          if (!bearer || bearer.split(" ")[1] !== "validAccessToken") {
+            return unauthorizedError(res, "Access token not found or is not valid!");
+          }
+
+          next();
+        }),
+      }));
+
+      server = (await import("#server/server.js")).default;
+    });
+
+    afterEach(async () => {
+      jest.restoreAllMocks();
+      jest.clearAllMocks();
+    });
+
+    test("", async () => {});
+
+    test("", async () => {});
+  });
 });

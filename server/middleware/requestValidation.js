@@ -18,12 +18,17 @@ import { badRequestError } from "#server/utils/errors.js";
 export default function validateRequest(schema) {
   return (req, res, next) => {
     try {
-      schema.parse({
+      const validatedData = schema.parse({
         body: req.body,
         query: req.query,
         params: req.params,
         files: req.files,
       });
+
+      req.body = validatedData.body;
+      req.query = validatedData.query;
+      req.params = validatedData.params;
+      req.files = validatedData.files;
 
       next();
     } catch (error) {

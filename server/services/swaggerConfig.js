@@ -281,6 +281,42 @@ const docConfig = {
           },
         },
       },
+      ResponseGetBidsSchema: {
+        type: "object",
+        required: ["bids", "count", "limit", "offset"],
+        properties: {
+          count: {
+            type: "number",
+            example: 5,
+            description: "Bids count",
+          },
+          limit: {
+            type: "number",
+            example: 10,
+            description: "Bids limit",
+          },
+          offset: {
+            type: "number",
+            example: 0,
+            description: "Bids offset",
+          },
+          bids: {
+            type: "array",
+            example: [
+              {
+                id: "c759d20a-d96c-40bc-9774-579d59744f24",
+                status: "pending",
+                message: "Lorem ipsum dolor sit...",
+                authorId: "adb7247d-f032-4919-8da5-2d3987b046ee",
+                createdAt: "2025-04-13T20:39:11.834Z",
+                updatedAt: "2025-04-13T20:39:11.834Z",
+                deletedAt: null,
+              },
+            ],
+            description: "Bids array; empty if no bids found",
+          },
+        },
+      },
       Response400Schema: {
         type: "object",
         required: ["message"],
@@ -312,6 +348,32 @@ const docConfig = {
             example: "Not found!",
             description: "Error message",
           },
+        },
+      },
+    },
+    parameters: {
+      LimitInQuery: {
+        in: "query",
+        name: "limit",
+        description: "Limit of items per page",
+        required: false,
+        default: 10,
+        schema: {
+          type: "integer",
+          format: "integer",
+          example: 10,
+        },
+      },
+      OffsetInQuery: {
+        in: "query",
+        name: "page",
+        description: "Page number",
+        required: false,
+        default: 0,
+        schema: {
+          type: "integer",
+          format: "integer",
+          example: 0,
         },
       },
     },

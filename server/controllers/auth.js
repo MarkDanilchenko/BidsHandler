@@ -64,7 +64,7 @@ class AuthController {
         avatar,
       });
 
-      res.sendStatus(201);
+      res.status(201);
       res.end();
     } catch (error) {
       badRequestError(res, error.message);
@@ -235,7 +235,7 @@ class AuthController {
         },
       });
 
-      res.sendStatus(200);
+      res.status(200);
       res.end();
     } catch (error) {
       badRequestError(res, error.message);

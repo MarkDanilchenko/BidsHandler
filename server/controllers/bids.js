@@ -19,7 +19,7 @@ class BidsController {
           }
         }
       }
-    }
+    },
     #swagger.responses[200] = {
       description: 'OK',
     },
@@ -56,14 +56,74 @@ class BidsController {
 
       await Bid.create(options);
 
-      res.sendStatus(200);
+      res.status(200);
       res.end();
     } catch (error) {
       badRequestError(res, error.message);
     }
   }
 
-  async getBids(req, res) {}
+  async getBids(req, res) {
+    /*
+    #swagger.tags = ['Bids&Comments']
+    #swagger.summary = 'Get bids end-point.'
+    #swagger.description = 'This is the end-point to get bids.'
+    #swagger.operationId = 'getBids'
+    #swagger.security = [{"bearerAuth": []}]
+    #swagger.parameters['$ref'] = ['#/components/parameters/LimitInQuery', '#/components/parameters/OffsetInQuery']
+    #swagger.responses[200] = {
+      description: 'OK',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/ResponseGetBidsSchema'
+          }
+        }
+      }
+    },
+    #swagger.responses[400] = {
+      description: 'Bad Request',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response400Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[401] = {
+      description: 'Unauthorized',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response401Schema'
+          }
+        }
+      }
+    }
+    */
+    try {
+      const { limit, offset } = req.query;
+
+      const { rows: bids, count } = await Bid.findAndCountAll({
+        offset,
+        limit,
+      });
+
+      res.status(200);
+      res.send(
+        JSON.stringify({
+          bids,
+          count,
+          limit: parseInt(limit),
+          offset: parseInt(offset),
+        }),
+      );
+      res.end();
+    } catch (error) {
+      badRequestError(res, error.message);
+    }
+  }
 
   async getOneBid(req, res) {}
 

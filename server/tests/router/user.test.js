@@ -202,7 +202,7 @@ describe("User routes:", () => {
           first_name: user.firstName,
           last_name: user.lastName,
           gender: user.gender,
-          isAdmin: user.isAdmin ? "true" : "false",
+          isAdmin: user.isAdmin ?? false,
           avatar: expect.stringMatching(
             /uploads\/avatars\/avatar-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.jpe?g|png$/,
           ),
@@ -283,7 +283,7 @@ describe("User routes:", () => {
           first_name: user.firstName,
           last_name: user.lastName,
           gender: user.gender,
-          isAdmin: user.isAdmin ? "true" : "false",
+          isAdmin: user.isAdmin ?? false,
           avatar: expect.stringMatching(
             /uploads\/avatars\/avatar-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.jpe?g|png$/,
           ),

@@ -6,4 +6,17 @@ const createBidSchema = z.object({
   }),
 });
 
-export { createBidSchema };
+const getBidsListSchema = z.object({
+  query: z.object({
+    limit: z
+      .string()
+      .refine((value) => parseInt(value) > 0)
+      .default("10"),
+    offset: z
+      .string()
+      .refine((value) => parseInt(value) >= 0)
+      .default("0"),
+  }),
+});
+
+export { createBidSchema, getBidsListSchema };
