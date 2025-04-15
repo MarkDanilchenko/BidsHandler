@@ -111,14 +111,12 @@ class BidsController {
       });
 
       res.status(200);
-      res.send(
-        JSON.stringify({
-          bids,
-          count,
-          limit: parseInt(limit),
-          offset: parseInt(offset),
-        }),
-      );
+      res.send({
+        bids,
+        count,
+        limit,
+        offset,
+      });
       res.end();
     } catch (error) {
       badRequestError(res, error.message);

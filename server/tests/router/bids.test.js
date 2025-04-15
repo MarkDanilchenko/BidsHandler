@@ -151,8 +151,8 @@ describe("Bids routes:", () => {
         });
 
       expect(mockBidFindAndCountAll).toHaveBeenCalledWith({
-        limit: String(10),
-        offset: String(0),
+        limit: 10,
+        offset: 0,
       });
       expect(mockBidFindAndCountAll).toHaveReturnedWith({
         bids: [
@@ -173,9 +173,54 @@ describe("Bids routes:", () => {
       expect(response.statusCode).toBe(200);
     });
 
-    test("should return JSON response with message, if findAndCountAll or smth else throws an error, and 400 status code", async () => {});
+    test("should return JSON response with message, if findAndCountAll or smth else throws an error, and 400 status code", async () => {
+      mockBidFindAndCountAll = jest.spyOn(Bid, "findAndCountAll").mockImplementation(() => {
+        throw new Error("Smth goes wrong");
+      });
 
-    test("should return JSON response with message, if npt valid data in req.query, and 400 status code", async () => {});
+      const response = await request(server)
+        .get("/api/v1/bids/")
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .query({
+          limit: 10,
+          offset: 0,
+        });
+
+      expect(mockBidFindAndCountAll).toHaveBeenCalledWith({
+        limit: 10,
+        offset: 0,
+      });
+      expect(response.text).toEqual(JSON.stringify({ message: "Smth goes wrong" }));
+      expect(response.statusCode).toBe(400);
+    });
+
+    test("should return JSON response with message, if not valid data in req.query, and 400 status code", async () => {
+      mockBidFindAndCountAll = jest.fn();
+
+      const response = await request(server)
+        .get("/api/v1/bids/")
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .query({
+          limit: "not a number",
+          offset: "not a number",
+        });
+
+      expect(mockBidFindAndCountAll).not.toHaveBeenCalled();
+      expect(response.text).toEqual(
+        JSON.stringify({
+          message: {
+            code: "invalid_type",
+            expected: "number",
+            received: "nan",
+            path: ["query", "limit"],
+            message: "Expected number, received nan",
+          },
+        }),
+      );
+      expect(response.statusCode).toBe(400);
+    });
   });
 
   describe("", () => {

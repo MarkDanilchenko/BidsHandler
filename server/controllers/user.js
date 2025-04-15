@@ -110,7 +110,7 @@ class UserController {
     try {
       const accessToken = req.headers.authorization.split(" ")[1];
       const { username, firstName, lastName, gender, isAdmin } = req.body;
-      const avatar = Object.keys(req.files).length ? req.files.avatar[0].path : null;
+      const avatar = Object.keys(req.files).length ? req.files.avatar[0].path : undefined;
 
       const { userId } = jwt.decode(accessToken);
 
@@ -121,22 +121,21 @@ class UserController {
         return notFoundError(res, "User not found!");
       }
 
-      const previousAvatarPath = user.avatar;
       const options = {
         username,
         first_name: firstName,
         last_name: lastName,
         gender,
         isAdmin,
-        avatar,
+        avatar: avatar ? avatar : user.avatar,
       };
 
       await User.update(options, {
         where: { id: userId },
       });
 
-      if (previousAvatarPath) {
-        fs.unlink(previousAvatarPath, (error) => {
+      if (avatar && user.avatar) {
+        fs.unlink(user.avatar, (error) => {
           if (error) {
             logger.error(error.message);
           }
