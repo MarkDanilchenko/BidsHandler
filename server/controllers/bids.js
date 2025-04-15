@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Bid } from "../models/index.js";
-import { badRequestError } from "../utils/errors.js";
+import { badRequestError, notFoundError } from "../utils/errors.js";
 
 class BidsController {
   async createBid(req, res) {
@@ -123,7 +123,74 @@ class BidsController {
     }
   }
 
-  async getOneBid(req, res) {}
+  async getOneBid(req, res) {
+    /*
+    #swagger.tags = ['Bids&Comments']
+    #swagger.summary = 'Get one bid end-point.'
+    #swagger.description = 'This is the end-point to get one bid.'
+    #swagger.operationId = 'getOneBid'
+    #swagger.security = [{"bearerAuth": []}]
+    #swagger.parameters['$ref'] = ['#/components/parameters/IdInPath']
+    #swagger.responses[200] = {
+      description: 'OK',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/ResponseGetOneBidSchema'
+          }
+        }
+      }
+    },
+    #swagger.responses[400] = {
+      description: 'Bad Request',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response400Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[401] = {
+      description: 'Unauthorized',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response401Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[404] = {
+      description: 'Not Found',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response404Schema'
+          }
+        }
+      }
+    }
+    */
+    try {
+      const { id } = req.params;
+
+      const bid = await Bid.findOne({
+        where: {
+          id,
+        },
+      });
+      if (!bid) {
+        return notFoundError(res, "Bid not found!");
+      }
+
+      res.status(200);
+      res.send(bid);
+      res.end();
+    } catch (error) {
+      badRequestError(res, error.message);
+    }
+  }
 
   async processBid(req, res) {}
 }

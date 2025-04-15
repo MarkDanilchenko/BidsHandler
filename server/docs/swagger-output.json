@@ -36,9 +36,7 @@
   "paths": {
     "/": {
       "get": {
-        "tags": [
-          "Redirect"
-        ],
+        "tags": ["Redirect"],
         "summary": "Redirect to the API home page.",
         "description": "This is a redirect to the API home page.",
         "operationId": "redirect",
@@ -61,9 +59,7 @@
     },
     "/api/v1/auth/signup": {
       "post": {
-        "tags": [
-          "Reg&Auth"
-        ],
+        "tags": ["Reg&Auth"],
         "summary": "Sign up end-point.",
         "description": "This is the end-point to sign up in the system.",
         "operationId": "signup",
@@ -96,9 +92,7 @@
     },
     "/api/v1/auth/signin": {
       "get": {
-        "tags": [
-          "Reg&Auth"
-        ],
+        "tags": ["Reg&Auth"],
         "summary": "Sign in end-point.",
         "description": "This is the end-point to signin in the system.",
         "operationId": "signin",
@@ -158,9 +152,7 @@
     },
     "/api/v1/auth/signout": {
       "post": {
-        "tags": [
-          "Reg&Auth"
-        ],
+        "tags": ["Reg&Auth"],
         "summary": "Sign out end-point.",
         "description": "This is the end-point to sign out in the system and remove their refresh tokens permanently.",
         "operationId": "signout",
@@ -197,9 +189,7 @@
     },
     "/api/v1/auth/refresh": {
       "post": {
-        "tags": [
-          "Reg&Auth"
-        ],
+        "tags": ["Reg&Auth"],
         "summary": "Refresh of the access token end-point.",
         "description": "This is the end-point for the   access token.",
         "operationId": "refresh",
@@ -263,9 +253,7 @@
     },
     "/api/v1/user/profile": {
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Retrieve profile end-point.",
         "description": "This is the end-point to retrieve user profile.",
         "operationId": "retrieveProfile",
@@ -317,9 +305,7 @@
         ]
       },
       "put": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Update profile end-point.",
         "description": "This is the end-point to update user profile.",
         "operationId": "updateProfile",
@@ -374,9 +360,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Delete profile end-point.",
         "description": "This is the end-point to delete user profile.",
         "operationId": "deleteProfile",
@@ -423,9 +407,7 @@
     },
     "/api/v1/user/profile/restore": {
       "patch": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Restore profile end-point.",
         "description": "This is the end-point to restore user profile.",
         "operationId": "restoreProfile",
@@ -478,9 +460,7 @@
     },
     "/api/v1/bids/": {
       "get": {
-        "tags": [
-          "Bids&Comments"
-        ],
+        "tags": ["Bids&Comments"],
         "summary": "Get bids end-point.",
         "description": "This is the end-point to get bids.",
         "operationId": "getBids",
@@ -531,9 +511,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "Bids&Comments"
-        ],
+        "tags": ["Bids&Comments"],
         "summary": "Create bid end-point.",
         "description": "This is the end-point to create bid.",
         "operationId": "createBid",
@@ -590,7 +568,10 @@
     },
     "/api/v1/bids/{id}": {
       "get": {
-        "description": "",
+        "tags": ["Bids&Comments"],
+        "summary": "Get one bid end-point.",
+        "description": "This is the end-point to get one bid.",
+        "operationId": "getOneBid",
         "parameters": [
           {
             "name": "id",
@@ -599,13 +580,58 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdInPath"
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseGetOneBidSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response400Schema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response401Schema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response404Schema"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "patch": {
         "description": "",
@@ -720,9 +746,7 @@
     },
     "/api/v1/": {
       "get": {
-        "tags": [
-          "Greeting"
-        ],
+        "tags": ["Greeting"],
         "summary": "Greeting HTML-page end-point.",
         "description": "This is a base greeting HTML-page of the API.",
         "operationId": "greeting",
@@ -768,16 +792,23 @@
           "format": "integer",
           "example": 0
         }
+      },
+      "IdInPath": {
+        "in": "path",
+        "name": "id",
+        "description": "Request bid uuid",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "c759d20a-d96c-40bc-9774-579d59744f24"
+        }
       }
     },
     "schemas": {
       "RequestSignUpSchema": {
         "type": "object",
-        "required": [
-          "username",
-          "email",
-          "password"
-        ],
+        "required": ["username", "email", "password"],
         "properties": {
           "username": {
             "type": "string",
@@ -823,14 +854,10 @@
       },
       "RequestSignInSchema": {
         "type": "object",
-        "required": [
-          "password"
-        ],
+        "required": ["password"],
         "oneOf": [
           {
-            "required": [
-              "username"
-            ],
+            "required": ["username"],
             "properties": {
               "username": {
                 "type": "string",
@@ -840,9 +867,7 @@
             }
           },
           {
-            "required": [
-              "email"
-            ],
+            "required": ["email"],
             "properties": {
               "email": {
                 "type": "string",
@@ -898,14 +923,10 @@
       },
       "RequestRestoreProfileSchema": {
         "type": "object",
-        "required": [
-          "password"
-        ],
+        "required": ["password"],
         "oneOf": [
           {
-            "required": [
-              "username"
-            ],
+            "required": ["username"],
             "properties": {
               "username": {
                 "type": "string",
@@ -915,9 +936,7 @@
             }
           },
           {
-            "required": [
-              "email"
-            ],
+            "required": ["email"],
             "properties": {
               "email": {
                 "type": "string",
@@ -937,9 +956,7 @@
       },
       "RequestCreateBidSchema": {
         "type": "object",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "message": {
             "type": "string",
@@ -950,9 +967,7 @@
       },
       "ResponseSuccessfulAuthenticationRefreshSchema": {
         "type": "object",
-        "required": [
-          "accessToken"
-        ],
+        "required": ["accessToken"],
         "properties": {
           "accessToken": {
             "type": "string",
@@ -1036,12 +1051,7 @@
       },
       "ResponseGetBidsSchema": {
         "type": "object",
-        "required": [
-          "bids",
-          "count",
-          "limit",
-          "offset"
-        ],
+        "required": ["bids", "count", "limit", "offset"],
         "properties": {
           "count": {
             "type": "number",
@@ -1075,11 +1085,50 @@
           }
         }
       },
+      "ResponseGetOneBidSchema": {
+        "type": "object",
+        "required": ["id", "status", "message", "authorId", "createdAt", "updatedAt", "deletedAt"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "c759d20a-d96c-40bc-9774-579d59744f24",
+            "description": "Bid id (uuidv4)"
+          },
+          "status": {
+            "type": "string",
+            "example": "pending",
+            "description": "Bid status"
+          },
+          "message": {
+            "type": "string",
+            "example": "Lorem ipsum dolor sit...",
+            "description": "Bid message"
+          },
+          "authorId": {
+            "type": "string",
+            "example": "adb7247d-f032-4919-8da5-2d3987b046ee",
+            "description": "Bid author id (uuidv4)"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2025-04-13T20:39:11.834Z",
+            "description": "Bid creation date"
+          },
+          "updatedAt": {
+            "type": "string",
+            "example": "2025-04-13T20:39:11.834Z",
+            "description": "Bid last update date"
+          },
+          "deletedAt": {
+            "type": "string",
+            "example": "2025-04-13T20:39:11.834Z",
+            "description": "Bid soft deletion date"
+          }
+        }
+      },
       "Response400Schema": {
         "type": "object",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "message": {
             "type": "string",
@@ -1090,9 +1139,7 @@
       },
       "Response401Schema": {
         "type": "object",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "message": {
             "type": "string",
@@ -1103,9 +1150,7 @@
       },
       "Response404Schema": {
         "type": "object",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "message": {
             "type": "string",

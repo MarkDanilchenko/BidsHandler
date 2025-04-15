@@ -13,4 +13,10 @@ const getBidsListSchema = z.object({
   }),
 });
 
-export { createBidSchema, getBidsListSchema };
+const getBidSchema = z.object({
+  params: z.object({
+    id: z.string().uuid(),
+  }),
+});
+
+export { createBidSchema, getBidsListSchema, getBidSchema };

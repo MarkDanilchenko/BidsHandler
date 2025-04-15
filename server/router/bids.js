@@ -3,7 +3,7 @@ import bidsController from "../controllers/bids.js";
 import commentsController from "../controllers/comments.js";
 import validateJwt from "../middleware/jwtValidation.js";
 import validateRequest from "../middleware/requestValidation.js";
-import { createBidSchema, getBidsListSchema } from "../utils/validationSchemas/bid.js";
+import { createBidSchema, getBidSchema, getBidsListSchema } from "../utils/validationSchemas/bid.js";
 
 const router = express.Router();
 
@@ -12,7 +12,10 @@ router
   .get(validateJwt, validateRequest(getBidsListSchema), bidsController.getBids)
   .post(validateJwt, validateRequest(createBidSchema), bidsController.createBid);
 
-router.route("/:id").get(bidsController.getOneBid).patch(bidsController.processBid);
+router
+  .route("/:id")
+  .get(validateJwt, validateRequest(getBidSchema), bidsController.getOneBid)
+  .patch(bidsController.processBid);
 
 router.route("/:id/comments").get(commentsController.getComments).post(commentsController.createComment);
 

@@ -223,7 +223,10 @@ describe("Bids routes:", () => {
     });
   });
 
-  describe("", () => {
+  describe("- get single bid", () => {
+    let bidId = uuidv4();
+    let authorId = uuidv4();
+    let mockBidFindOne;
     let server;
 
     beforeEach(async () => {
@@ -247,9 +250,67 @@ describe("Bids routes:", () => {
       jest.clearAllMocks();
     });
 
-    test("", async () => {});
+    test("should return one bid info and 200 status code", async () => {
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => {
+        return {
+          id: bidId,
+          status: "pending",
+          message: "Culpa reiciendis eaque praesentium quo corporis quos optio voluptate nulla.",
+          authorId,
+          createdAt: "2025-04-14T18:29:13.963Z",
+          updatedAt: "2025-04-14T18:29:13.963Z",
+          deletedAt: null,
+        };
+      });
 
-    test("", async () => {});
+      const response = await request(server)
+        .get(`/api/v1/bids/${bidId}`)
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` });
+
+      expect(mockBidFindOne).toHaveBeenCalledWith({ where: { id: bidId } });
+      expect(mockBidFindOne).toHaveReturnedWith({
+        id: bidId,
+        status: "pending",
+        message: "Culpa reiciendis eaque praesentium quo corporis quos optio voluptate nulla.",
+        authorId,
+        createdAt: "2025-04-14T18:29:13.963Z",
+        updatedAt: "2025-04-14T18:29:13.963Z",
+        deletedAt: null,
+      });
+      expect(response.statusCode).toBe(200);
+    });
+
+    test("should return JSON response with message, if bid is not found, and 404 status code", async () => {
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => {
+        return null;
+      });
+
+      const response = await request(server)
+        .get(`/api/v1/bids/${bidId}`)
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` });
+
+      expect(mockBidFindOne).toHaveBeenCalledWith({ where: { id: bidId } });
+      expect(mockBidFindOne).toHaveReturnedWith(null);
+      expect(response.text).toEqual(JSON.stringify({ message: "Bid not found!" }));
+      expect(response.statusCode).toBe(404);
+    });
+
+    test("should return JSON response with message, if Bid.findOne or smth else throws an error, and 400 status code", async () => {
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => {
+        throw new Error("Smth goes wrong");
+      });
+
+      const response = await request(server)
+        .get(`/api/v1/bids/${bidId}`)
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` });
+
+      expect(mockBidFindOne).toHaveBeenCalledWith({ where: { id: bidId } });
+      expect(response.text).toEqual(JSON.stringify({ message: "Smth goes wrong" }));
+      expect(response.statusCode).toBe(400);
+    });
   });
 
   describe("", () => {

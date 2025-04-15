@@ -317,6 +317,47 @@ const docConfig = {
           },
         },
       },
+      ResponseGetOneBidSchema: {
+        type: "object",
+        required: ["id", "status", "message", "authorId", "createdAt", "updatedAt", "deletedAt"],
+        properties: {
+          id: {
+            type: "string",
+            example: "c759d20a-d96c-40bc-9774-579d59744f24",
+            description: "Bid id (uuidv4)",
+          },
+          status: {
+            type: "string",
+            example: "pending",
+            description: "Bid status",
+          },
+          message: {
+            type: "string",
+            example: "Lorem ipsum dolor sit...",
+            description: "Bid message",
+          },
+          authorId: {
+            type: "string",
+            example: "adb7247d-f032-4919-8da5-2d3987b046ee",
+            description: "Bid author id (uuidv4)",
+          },
+          createdAt: {
+            type: "string",
+            example: "2025-04-13T20:39:11.834Z",
+            description: "Bid creation date",
+          },
+          updatedAt: {
+            type: "string",
+            example: "2025-04-13T20:39:11.834Z",
+            description: "Bid last update date",
+          },
+          deletedAt: {
+            type: "string",
+            example: "2025-04-13T20:39:11.834Z",
+            description: "Bid soft deletion date",
+          },
+        },
+      },
       Response400Schema: {
         type: "object",
         required: ["message"],
@@ -374,6 +415,17 @@ const docConfig = {
           type: "integer",
           format: "integer",
           example: 0,
+        },
+      },
+      IdInPath: {
+        in: "path",
+        name: "id",
+        description: "Request bid uuid",
+        required: true,
+        schema: {
+          type: "string",
+          format: "uuid",
+          example: "c759d20a-d96c-40bc-9774-579d59744f24",
         },
       },
     },
