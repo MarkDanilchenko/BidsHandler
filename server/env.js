@@ -13,6 +13,10 @@ const {
   JWT_SECRET,
   JWT_ACCESS_EXPIRES_IN,
   JWT_REFRESH_EXPIRES_IN,
+  SMTP_HOST,
+  SMTP_PORT,
+  SMTP_USER,
+  SMTP_PASSWORD,
 } = process.env;
 
 const expressOptions = {
@@ -24,6 +28,13 @@ const expressOptions = {
   jwtRefreshExpiresIn: JWT_REFRESH_EXPIRES_IN,
 };
 
+const smtpOptions = {
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  user: SMTP_USER,
+  password: SMTP_PASSWORD,
+};
+
 const postgreSQLOptions = {
   databaseName: DATABASE_NAME,
   username: DATABASE_USER,
@@ -32,4 +43,4 @@ const postgreSQLOptions = {
   port: DATABASE_PORT || 5432,
 };
 
-export { expressOptions, postgreSQLOptions };
+export { expressOptions, postgreSQLOptions, smtpOptions };
