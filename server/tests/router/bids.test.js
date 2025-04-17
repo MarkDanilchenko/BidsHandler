@@ -313,10 +313,19 @@ describe("Bids routes:", () => {
     });
   });
 
-  describe("", () => {
+  describe("- resolve bid", () => {
+    let bidId = uuidv4();
     let server;
 
     beforeEach(async () => {
+      jest.spyOn(jwt, "decode").mockImplementation((accessToken) => {
+        if (accessToken !== "validAccessToken") {
+          return null;
+        }
+
+        return { userId };
+      });
+
       jest.unstable_mockModule("#server/middleware/jwtValidation.js", () => ({
         default: jest.fn((req, res, next) => {
           const bearer = req.headers.authorization;
@@ -337,8 +346,34 @@ describe("Bids routes:", () => {
       jest.clearAllMocks();
     });
 
-    test("", async () => {});
+    test("", async () => {
+      const response = await request(server)
+        .patch(`/api/v1/bids/${bidId}`)
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .send({
+          status: "accepted",
+        });
+    });
 
-    test("", async () => {});
+    test("", async () => {
+      const response = await request(server)
+        .patch(`/api/v1/bids/${bidId}`)
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .send({
+          status: "accepted",
+        });
+    });
+
+    test("", async () => {
+      const response = await request(server)
+        .patch(`/api/v1/bids/${bidId}`)
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .send({
+          status: "accepted",
+        });
+    });
   });
 });
