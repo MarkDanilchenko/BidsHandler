@@ -19,4 +19,13 @@ const getBidSchema = z.object({
   }),
 });
 
-export { createBidSchema, getBidsListSchema, getBidSchema };
+const processBidSchema = z.object({
+  body: z.object({
+    status: z.enum(["pending", "accepted", "rejected"]),
+  }),
+  params: z.object({
+    id: z.string().uuid(),
+  }),
+});
+
+export { createBidSchema, getBidsListSchema, getBidSchema, processBidSchema };

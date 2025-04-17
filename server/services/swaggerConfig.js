@@ -197,6 +197,17 @@ const docConfig = {
           },
         },
       },
+      RequestProcessBidSchema: {
+        type: "object",
+        required: ["status"],
+        properties: {
+          status: {
+            type: "string",
+            example: "pending",
+            description: "Bid status",
+          },
+        },
+      },
       ResponseSuccessfulAuthenticationRefreshSchema: {
         type: "object",
         required: ["accessToken"],

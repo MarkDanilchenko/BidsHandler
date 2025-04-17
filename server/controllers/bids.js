@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
-import { Bid } from "../models/index.js";
-import { badRequestError, notFoundError } from "../utils/errors.js";
+import { Bid, User } from "#server/models/index.js";
+import { badRequestError, notFoundError, unauthorizedError } from "#server/utils/errors.js";
+import sendEmail from "#server/services/nodeMailerConfig.js";
+import mailConfigurator from "#server/utils/mailConfigurator.js";
 
 class BidsController {
   async createBid(req, res) {
@@ -192,7 +194,110 @@ class BidsController {
     }
   }
 
-  async processBid(req, res) {}
+  async processBid(req, res) {
+    /*
+    #swagger.tags = ['Bids&Comments']
+    #swagger.summary = 'Process bid end-point.'
+    #swagger.description = 'This is the end-point to process bid with email notification to user.'
+    #swagger.operationId = 'processBid'
+    #swagger.security = [{"bearerAuth": []}]
+    #swagger.parameters['$ref'] = ['#/components/parameters/IdInPath']
+    @swagger.requestBody = {
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/RequestProcessBidSchema'
+          }
+        }
+      }
+    },
+    #swagger.responses[200] = {
+      description: 'OK',
+    },
+    #swagger.responses[400] = {
+      description: 'Bad Request',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response400Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[401] = {
+      description: 'Unauthorized',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response401Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[404] = {
+      description: 'Not Found',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response404Schema'
+          }
+        }
+      }
+    }
+    */
+    try {
+      const accessToken = req.headers.authorization.split(" ")[1];
+      const { id } = req.params;
+      const { status } = req.body;
+
+      const { userId } = jwt.decode(accessToken);
+      const user = await User.findOne({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) {
+        return notFoundError(res, "User not found!");
+      }
+      if (!user.isAdmin) {
+        return unauthorizedError(res, "Only admins can process bids!");
+      }
+
+      const bid = await Bid.findOne({
+        where: {
+          id,
+        },
+      });
+      if (!bid) {
+        return notFoundError(res, "Bid not found!");
+      }
+
+      await Bid.update(
+        { status },
+        {
+          where: {
+            id,
+          },
+        },
+      );
+
+      // Sending email back to user with updated bid status;
+      const mailOptions = mailConfigurator(
+        user.email,
+        "Bid processed",
+        `Your bid has been processed with status: ${status}`,
+        null,
+        user.username,
+      );
+      await sendEmail(mailOptions);
+
+      res.status(200);
+      res.end();
+    } catch (error) {
+      badRequestError(res, error.message);
+    }
+  }
 }
 
 const bidsController = new BidsController();
