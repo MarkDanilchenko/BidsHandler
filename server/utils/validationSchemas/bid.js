@@ -21,7 +21,7 @@ const getBidSchema = z.object({
 
 const processBidSchema = z.object({
   body: z.object({
-    status: z.enum(["pending", "accepted", "rejected"]),
+    status: z.enum(["pending", "resolved", "rejected"]),
   }),
   params: z.object({
     id: z.string().uuid(),
