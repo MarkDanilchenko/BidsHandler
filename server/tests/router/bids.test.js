@@ -1,8 +1,9 @@
 import request from "supertest";
 import jwt from "jsonwebtoken";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, jest, test } from "@jest/globals";
-import { sequelizeConnection, Bid } from "#server/models/index.js";
+import { sequelizeConnection, Bid, User } from "#server/models/index.js";
 import { v4 as uuidv4 } from "uuid";
+import { createFakeUser } from "#server/tests/fixtures/user.js";
 
 describe("Bids routes:", () => {
   beforeAll(async () => {
@@ -314,7 +315,12 @@ describe("Bids routes:", () => {
   });
 
   describe("- resolve bid", () => {
+    let userId = uuidv4();
     let bidId = uuidv4();
+    let user = createFakeUser();
+    let mockUserFindOne;
+    let mockBidFindOne;
+    let mockBidUpdate;
     let server;
 
     beforeEach(async () => {
@@ -346,34 +352,202 @@ describe("Bids routes:", () => {
       jest.clearAllMocks();
     });
 
-    test("", async () => {
+    test("should process one bid, send an email and return 200 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return {
+          id: userId,
+          username: user.username,
+          email: user.email,
+          isAdmin: true,
+        };
+      });
+
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => true);
+
+      mockBidUpdate = jest.spyOn(Bid, "update").mockImplementation((options) => true);
+
       const response = await request(server)
         .patch(`/api/v1/bids/${bidId}`)
         .set({ "Content-Type": "application/json" })
         .set({ Authorization: `Bearer validAccessToken` })
         .send({
-          status: "accepted",
+          status: "resolved",
         });
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        id: userId,
+        username: user.username,
+        email: user.email,
+        isAdmin: true,
+      });
+      expect(mockBidFindOne).toHaveBeenCalledWith({ where: { id: bidId } });
+      expect(mockBidFindOne).toHaveReturnedWith(true);
+      expect(mockBidUpdate).toHaveBeenCalledWith({ status: "resolved" }, { where: { id: bidId } });
+      expect(mockBidUpdate).toHaveReturnedWith(true);
+      expect(response.statusCode).toBe(200);
     });
 
-    test("", async () => {
+    test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => null);
+
       const response = await request(server)
         .patch(`/api/v1/bids/${bidId}`)
         .set({ "Content-Type": "application/json" })
         .set({ Authorization: `Bearer validAccessToken` })
         .send({
-          status: "accepted",
+          status: "resolved",
         });
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith(null);
+      expect(response.text).toEqual(JSON.stringify({ message: "User not found!" }));
+      expect(response.statusCode).toBe(404);
     });
 
-    test("", async () => {
+    test("should return JSON response with message, if user is not admin, and 401 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return {
+          id: userId,
+          username: user.username,
+          email: user.email,
+          isAdmin: false,
+        };
+      });
+
       const response = await request(server)
         .patch(`/api/v1/bids/${bidId}`)
         .set({ "Content-Type": "application/json" })
         .set({ Authorization: `Bearer validAccessToken` })
         .send({
-          status: "accepted",
+          status: "resolved",
         });
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        id: userId,
+        username: user.username,
+        email: user.email,
+        isAdmin: false,
+      });
+      expect(response.text).toEqual(JSON.stringify({ message: "Only admins can process bids!" }));
+      expect(response.statusCode).toBe(401);
+    });
+
+    test("should return JSON response with message, if bid is not found, and 404 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return {
+          id: userId,
+          username: user.username,
+          email: user.email,
+          isAdmin: true,
+        };
+      });
+
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => {
+        return null;
+      });
+
+      const response = await request(server)
+        .patch(`/api/v1/bids/${bidId}`)
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .send({
+          status: "resolved",
+        });
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        id: userId,
+        username: user.username,
+        email: user.email,
+        isAdmin: true,
+      });
+      expect(mockBidFindOne).toHaveBeenCalledWith({ where: { id: bidId } });
+      expect(mockBidFindOne).toHaveReturnedWith(null);
+      expect(response.text).toEqual(JSON.stringify({ message: "Bid not found!" }));
+      expect(response.statusCode).toBe(404);
+    });
+
+    test("should return JSON response with message, if Bid.update or smth else throws an error, and 400 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+        return {
+          id: userId,
+          username: user.username,
+          email: user.email,
+          isAdmin: true,
+        };
+      });
+
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => {
+        return true;
+      });
+
+      mockBidUpdate = jest.spyOn(Bid, "update").mockImplementation((options) => {
+        throw new Error("Smth goes wrong");
+      });
+
+      const response = await request(server)
+        .patch(`/api/v1/bids/${bidId}`)
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .send({
+          status: "resolved",
+        });
+
+      expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
+      expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith({
+        id: userId,
+        username: user.username,
+        email: user.email,
+        isAdmin: true,
+      });
+      expect(mockBidFindOne).toHaveBeenCalledWith({ where: { id: bidId } });
+      expect(mockBidFindOne).toHaveReturnedWith(true);
+      expect(mockBidUpdate).toHaveBeenCalledWith({ status: "resolved" }, { where: { id: bidId } });
+      expect(response.text).toEqual(JSON.stringify({ message: "Smth goes wrong" }));
+      expect(response.statusCode).toBe(400);
+    });
+
+    test("should return JSON response with message, if provided status is not valid, and 400 status code", async () => {
+      mockUserFindOne = jest.fn();
+      mockBidFindOne = jest.fn();
+      mockBidUpdate = jest.fn();
+
+      const response = await request(server)
+        .patch(`/api/v1/bids/${bidId}`)
+        .set({ "Content-Type": "application/json" })
+        .set({ Authorization: `Bearer validAccessToken` })
+        .send({
+          status: "wrongStatus",
+        });
+
+      expect(jwt.decode).not.toHaveBeenCalled();
+      expect(mockUserFindOne).not.toHaveBeenCalled();
+      expect(mockBidFindOne).not.toHaveBeenCalled();
+      expect(mockBidUpdate).not.toHaveBeenCalled();
+      expect(response.text).toEqual(
+        JSON.stringify({
+          message: {
+            received: "wrongStatus",
+            code: "invalid_enum_value",
+            options: ["pending", "resolved", "rejected"],
+            path: ["body", "status"],
+            message: "Invalid enum value. Expected 'pending' | 'resolved' | 'rejected', received 'wrongStatus'",
+          },
+        }),
+      );
+      expect(response.statusCode).toBe(400);
     });
   });
 });

@@ -202,7 +202,7 @@ class BidsController {
     #swagger.operationId = 'processBid'
     #swagger.security = [{"bearerAuth": []}]
     #swagger.parameters['$ref'] = ['#/components/parameters/IdInPath']
-    @swagger.requestBody = {
+    #swagger.requestBody = {
       required: true,
       content: {
         'application/json': {

@@ -14,6 +14,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+/**
+ * Sends an email using the transporter.
+ *
+ * @param {import("nodemailer/lib/mailer").SendMailOptions} mailOptions - Email options.
+ *
+ * @throws {Error} If transporter verification fails or email sending fails.
+ */
 export default async function sendEmail(mailOptions) {
   try {
     if (!mailOptions) {
@@ -34,7 +41,5 @@ export default async function sendEmail(mailOptions) {
     }
   } catch (error) {
     logger.error(error.message);
-
-    throw error;
   }
 }

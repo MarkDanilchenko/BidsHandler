@@ -1,4 +1,4 @@
-import { expect, jest, test } from "@jest/globals";
+import { afterEach, expect, test, jest } from "@jest/globals";
 import mailConfigurator from "#server/utils/mailConfigurator.js";
 
 describe("Generator of the response mails, for the bids processing", () => {
@@ -19,6 +19,11 @@ describe("Generator of the response mails, for the bids processing", () => {
         </div>`;
     },
   };
+
+  afterEach(async () => {
+    jest.restoreAllMocks();
+    jest.clearAllMocks();
+  });
 
   test("should return a standard mail object, if <to>, <subject> and <text> are provided without any other arguments", () => {
     const mail = mailConfigurator(options.to, options.subject, options.text);
