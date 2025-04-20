@@ -25,7 +25,7 @@ export default [
         ...globals.jquery,
         ...globals.jest,
         ...globals.es2021,
-        globals: pluginJest.environments.globals.globals,
+        ...pluginJest.environments.globals.globals,
       },
     },
   },
