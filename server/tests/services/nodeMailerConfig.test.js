@@ -30,7 +30,7 @@ describe("sendEmail", () => {
   }, 10000);
 
   test("should send email and log a preview URL if using smtp.ethereal.email", async () => {
-    jest.spyOn(nodemailer, "getTestMessageUrl").mockImplementation((options) => "testUrlToPreview/email");
+    jest.spyOn(nodemailer, "getTestMessageUrl").mockImplementation(() => "testUrlToPreview/email");
 
     await sendEmail(mockedMailOptions);
 
@@ -39,7 +39,7 @@ describe("sendEmail", () => {
   }, 10000);
 
   test("should log an error message if smth goes wrong and sendEmail function fails", async () => {
-    jest.spyOn(nodemailer, "getTestMessageUrl").mockImplementationOnce((options) => {
+    jest.spyOn(nodemailer, "getTestMessageUrl").mockImplementationOnce(() => {
       throw new Error("Smth goes wrong");
     });
 

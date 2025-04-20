@@ -208,6 +208,28 @@ const docConfig = {
           },
         },
       },
+      RequestCreateBidCommentSchema: {
+        type: "object",
+        required: ["message"],
+        properties: {
+          message: {
+            type: "string",
+            example: "Bid comment message",
+            description: "Bid comment message",
+          },
+        },
+      },
+      RequestEditBidCommentSchema: {
+        type: "object",
+        required: ["message"],
+        properties: {
+          message: {
+            type: "string",
+            example: "Bid comment message",
+            description: "Bid comment message",
+          },
+        },
+      },
       ResponseSuccessfulAuthenticationRefreshSchema: {
         type: "object",
         required: ["accessToken"],
@@ -369,6 +391,42 @@ const docConfig = {
           },
         },
       },
+      ResponseGetBidCommentsSchema: {
+        type: "object",
+        required: ["comments", "count", "limit", "offset"],
+        properties: {
+          count: {
+            type: "number",
+            example: 5,
+            description: "Comments count",
+          },
+          limit: {
+            type: "number",
+            example: 10,
+            description: "Comments limit",
+          },
+          offset: {
+            type: "number",
+            example: 0,
+            description: "Comments offset",
+          },
+          comments: {
+            type: "array",
+            example: [
+              {
+                id: "c759d20a-d96c-40bc-9774-579d59744f24",
+                message: "Lorem ipsum dolor sit...",
+                authorId: "adb7247d-f032-4919-8da5-2d3987b046ee",
+                bidId: "c759d20a-d96c-40bc-9774-579d59744f24",
+                createdAt: "2025-04-13T20:39:11.834Z",
+                updatedAt: "2025-04-13T20:39:11.834Z",
+                deletedAt: null,
+              },
+            ],
+            description: "Comments array; empty if no comments found",
+          },
+        },
+      },
       Response400Schema: {
         type: "object",
         required: ["message"],
@@ -432,6 +490,17 @@ const docConfig = {
         in: "path",
         name: "id",
         description: "Request bid uuid",
+        required: true,
+        schema: {
+          type: "string",
+          format: "uuid",
+          example: "c759d20a-d96c-40bc-9774-579d59744f24",
+        },
+      },
+      CommentIdInPath: {
+        in: "path",
+        name: "commentId",
+        description: "Request comment uuid",
         required: true,
         schema: {
           type: "string",

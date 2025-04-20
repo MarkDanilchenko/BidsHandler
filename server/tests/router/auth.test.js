@@ -20,7 +20,7 @@ describe("Auth routes:", () => {
   });
 
   describe("- signout:", () => {
-    let userId = uuidv4();
+    const userId = uuidv4();
     let mockJwtDestroy;
     let mockUserFindOne;
     let server;
@@ -123,8 +123,8 @@ describe("Auth routes:", () => {
   });
 
   describe("- refresh token:", () => {
-    let userId = uuidv4();
-    let refresh_token = uuidv4();
+    const userId = uuidv4();
+    const refresh_token = uuidv4();
     let mockUserFindOne;
     let mockJwtFindOne;
     let mockJwtDestroy;

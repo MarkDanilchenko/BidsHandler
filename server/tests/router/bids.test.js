@@ -4,6 +4,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, jest, tes
 import { sequelizeConnection, Bid, User } from "#server/models/index.js";
 import { v4 as uuidv4 } from "uuid";
 import { createFakeUser } from "#server/tests/fixtures/user.js";
+import { unauthorizedError } from "#server/utils/errors.js";
 
 describe("Bids routes:", () => {
   beforeAll(async () => {
@@ -15,7 +16,7 @@ describe("Bids routes:", () => {
   });
 
   describe("- create a new bid", () => {
-    let userId = uuidv4();
+    const userId = uuidv4();
     const options = {
       message: "Test message",
       authorId: userId,
@@ -99,6 +100,17 @@ describe("Bids routes:", () => {
 
   describe("- get bids list", () => {
     let mockBidFindAndCountAll;
+    const bids = [
+      {
+        id: "f0a85187-7b03-48aa-b89e-9d8e20a429f8",
+        status: "pending",
+        message: "Culpa reiciendis eaque praesentium quo corporis quos optio voluptate nulla.",
+        authorId: "adb1167d-f532-4819-8da5-2d3987b046ee",
+        createdAt: "2025-04-14T18:29:13.963Z",
+        updatedAt: "2025-04-14T18:29:13.963Z",
+        deletedAt: null,
+      },
+    ];
     let server;
 
     beforeEach(async () => {
@@ -125,52 +137,25 @@ describe("Bids routes:", () => {
     test("should return bids list and 200 status code", async () => {
       mockBidFindAndCountAll = jest.spyOn(Bid, "findAndCountAll").mockImplementation(() => {
         return {
-          bids: [
-            {
-              id: "f0a85187-7b03-48aa-b89e-9d8e20a429f8",
-              status: "pending",
-              message: "Culpa reiciendis eaque praesentium quo corporis quos optio voluptate nulla.",
-              authorId: "adb1167d-f532-4819-8da5-2d3987b046ee",
-              createdAt: "2025-04-14T18:29:13.963Z",
-              updatedAt: "2025-04-14T18:29:13.963Z",
-              deletedAt: null,
-            },
-          ],
+          rows: bids,
           count: 1,
-          limit: 10,
-          offset: 0,
         };
       });
 
       const response = await request(server)
         .get("/api/v1/bids/")
         .set({ "Content-Type": "application/json" })
-        .set({ Authorization: `Bearer validAccessToken` })
-        .query({
-          limit: 10,
-          offset: 0,
-        });
+        .set({ Authorization: `Bearer validAccessToken` });
 
       expect(mockBidFindAndCountAll).toHaveBeenCalledWith({
         limit: 10,
         offset: 0,
       });
       expect(mockBidFindAndCountAll).toHaveReturnedWith({
-        bids: [
-          {
-            id: "f0a85187-7b03-48aa-b89e-9d8e20a429f8",
-            status: "pending",
-            message: "Culpa reiciendis eaque praesentium quo corporis quos optio voluptate nulla.",
-            authorId: "adb1167d-f532-4819-8da5-2d3987b046ee",
-            createdAt: "2025-04-14T18:29:13.963Z",
-            updatedAt: "2025-04-14T18:29:13.963Z",
-            deletedAt: null,
-          },
-        ],
+        rows: bids,
         count: 1,
-        limit: 10,
-        offset: 0,
       });
+      expect(response.text).toEqual(JSON.stringify({ bids, count: 1, limit: 10, offset: 0 }));
       expect(response.statusCode).toBe(200);
     });
 
@@ -182,11 +167,7 @@ describe("Bids routes:", () => {
       const response = await request(server)
         .get("/api/v1/bids/")
         .set({ "Content-Type": "application/json" })
-        .set({ Authorization: `Bearer validAccessToken` })
-        .query({
-          limit: 10,
-          offset: 0,
-        });
+        .set({ Authorization: `Bearer validAccessToken` });
 
       expect(mockBidFindAndCountAll).toHaveBeenCalledWith({
         limit: 10,
@@ -225,8 +206,8 @@ describe("Bids routes:", () => {
   });
 
   describe("- get single bid", () => {
-    let bidId = uuidv4();
-    let authorId = uuidv4();
+    const bidId = uuidv4();
+    const authorId = uuidv4();
     let mockBidFindOne;
     let server;
 
@@ -315,9 +296,9 @@ describe("Bids routes:", () => {
   });
 
   describe("- resolve bid", () => {
-    let userId = uuidv4();
-    let bidId = uuidv4();
-    let user = createFakeUser();
+    const userId = uuidv4();
+    const bidId = uuidv4();
+    const user = createFakeUser();
     let mockUserFindOne;
     let mockBidFindOne;
     let mockBidUpdate;

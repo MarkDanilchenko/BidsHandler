@@ -19,7 +19,7 @@ describe("User routes:", () => {
   });
 
   describe("- retrieve user profile", () => {
-    let userId = uuidv4();
+    const userId = uuidv4();
     let user;
     let mockUserFindOne;
     let hashedPassword;
@@ -119,7 +119,7 @@ describe("User routes:", () => {
   });
 
   describe("- update user profile", () => {
-    let userId = uuidv4();
+    const userId = uuidv4();
     let user;
     let avatar;
     let mockUserFindOne;
@@ -333,7 +333,7 @@ describe("User routes:", () => {
   });
 
   describe("- delete user profile", () => {
-    let userId = uuidv4();
+    const userId = uuidv4();
     let mockUserFindOne;
     let mockUserDestroy;
     let mockJwtDestroy;
@@ -445,7 +445,7 @@ describe("User routes:", () => {
   });
 
   describe("- restore user profile", () => {
-    let userId = uuidv4();
+    const userId = uuidv4();
     let user;
     let mockUserFindOne;
     let mockUserRestore;

@@ -738,7 +738,12 @@
     },
     "/api/v1/bids/{id}/comments": {
       "get": {
-        "description": "",
+        "tags": [
+          "Bids&Comments"
+        ],
+        "summary": "Get bids comments end-point.",
+        "description": "This is the end-point to get comments of a single bid.",
+        "operationId": "getComments",
         "parameters": [
           {
             "name": "id",
@@ -747,16 +752,72 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/LimitInQuery"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetInQuery"
+          },
+          {
+            "$ref": "#/components/parameters/IdInPath"
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseGetCommentsSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response400Schema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response401Schema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response404Schema"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "post": {
-        "description": "",
+        "tags": [
+          "Bids&Comments"
+        ],
+        "summary": "Create comment end-point.",
+        "description": "This is the end-point to create comment.",
+        "operationId": "createComment",
         "parameters": [
           {
             "name": "id",
@@ -765,18 +826,78 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdInPath"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "201": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response400Schema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response401Schema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response404Schema"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCreateBidCommentSchema"
+              }
+            }
           }
         }
       }
     },
     "/api/v1/bids/{id}/comments/{commentId}": {
       "delete": {
-        "description": "",
+        "tags": [
+          "Bids&Comments"
+        ],
+        "summary": "Delete comment end-point.",
+        "description": "This is the end-point to delete comment.",
+        "operationId": "deleteComment",
         "parameters": [
           {
             "name": "id",
@@ -793,16 +914,69 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdInPath"
+          },
+          {
+            "$ref": "#/components/parameters/CommentIdInPath"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response400Schema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response401Schema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response404Schema"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "patch": {
-        "description": "",
+        "tags": [
+          "Bids&Comments"
+        ],
+        "summary": "Edit comment end-point.",
+        "description": "This is the end-point to edit comment.",
+        "operationId": "editComment",
         "parameters": [
           {
             "name": "id",
@@ -819,11 +993,69 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdInPath"
+          },
+          {
+            "$ref": "#/components/parameters/CommentIdInPath"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response400Schema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response401Schema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response404Schema"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestEditBidCommentSchema"
+              }
+            }
           }
         }
       }
@@ -883,6 +1115,17 @@
         "in": "path",
         "name": "id",
         "description": "Request bid uuid",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "c759d20a-d96c-40bc-9774-579d59744f24"
+        }
+      },
+      "CommentIdInPath": {
+        "in": "path",
+        "name": "commentId",
+        "description": "Request comment uuid",
         "required": true,
         "schema": {
           "type": "string",
@@ -1082,6 +1325,32 @@
           }
         }
       },
+      "RequestCreateBidCommentSchema": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Bid comment message",
+            "description": "Bid comment message"
+          }
+        }
+      },
+      "RequestEditBidCommentSchema": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Bid comment message",
+            "description": "Bid comment message"
+          }
+        }
+      },
       "ResponseSuccessfulAuthenticationRefreshSchema": {
         "type": "object",
         "required": [
@@ -1255,6 +1524,47 @@
             "type": "string",
             "example": "2025-04-13T20:39:11.834Z",
             "description": "Bid soft deletion date"
+          }
+        }
+      },
+      "ResponseGetBidCommentsSchema": {
+        "type": "object",
+        "required": [
+          "comments",
+          "count",
+          "limit",
+          "offset"
+        ],
+        "properties": {
+          "count": {
+            "type": "number",
+            "example": 5,
+            "description": "Comments count"
+          },
+          "limit": {
+            "type": "number",
+            "example": 10,
+            "description": "Comments limit"
+          },
+          "offset": {
+            "type": "number",
+            "example": 0,
+            "description": "Comments offset"
+          },
+          "comments": {
+            "type": "array",
+            "example": [
+              {
+                "id": "c759d20a-d96c-40bc-9774-579d59744f24",
+                "message": "Lorem ipsum dolor sit...",
+                "authorId": "adb7247d-f032-4919-8da5-2d3987b046ee",
+                "bidId": "c759d20a-d96c-40bc-9774-579d59744f24",
+                "createdAt": "2025-04-13T20:39:11.834Z",
+                "updatedAt": "2025-04-13T20:39:11.834Z",
+                "deletedAt": null
+              }
+            ],
+            "description": "Comments array; empty if no comments found"
           }
         }
       },
