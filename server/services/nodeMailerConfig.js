@@ -17,8 +17,8 @@ const transporter = nodemailer.createTransport({
 /**
  * Sends an email using the transporter.
  *
- * @param {import("nodemailer/lib/mailer").SendMailOptions} mailOptions - Email options.
- *
+ * @async
+ * @param {SendMailOptions} mailOptions - Email options.
  * @throws {Error} If transporter verification fails or email sending fails.
  */
 export default async function sendEmail(mailOptions) {

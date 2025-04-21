@@ -1,9 +1,15 @@
+import fs from "fs";
+import { postgreSQLOptions, expressOptions } from "./env.js";
 import { sequelizeConnection } from "./models/index.js";
 import logger from "./services/loggerConfig.js";
-import { postgreSQLOptions, expressOptions } from "./env.js";
-import fs from "fs";
 import server from "./server.js";
 
+/**
+ * Starts the Express.js server.
+ * @async
+ * @function
+ * @returns {Promise<void>}
+ */
 async function startServer() {
   try {
     await sequelizeConnection.sync({ alter: true });

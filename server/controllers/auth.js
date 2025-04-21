@@ -24,7 +24,7 @@ class AuthController {
     }
     #swagger.responses[201] = {
       description: 'Created'
-    }
+    },
     #swagger.responses[400] = {
       description: 'Bad Request',
       content: {
@@ -35,7 +35,7 @@ class AuthController {
         }
       }
     }
-     */
+    */
     try {
       const { username, firstName, lastName, email, password, gender, isAdmin } = req.body;
       const avatar = Object.keys(req.files).length ? req.files.avatar[0].path : null;
@@ -46,7 +46,6 @@ class AuthController {
         },
         paranoid: false,
       });
-
       if (user) {
         return badRequestError(res, "User already exists");
       }
@@ -116,8 +115,8 @@ class AuthController {
           }
         }
       }
-    }
-      #swagger.responses[404] = {
+    },
+    #swagger.responses[404] = {
       description: 'Not Found',
       content: {
         'application/json': {
@@ -127,7 +126,7 @@ class AuthController {
         }
       }
     }
-     */
+    */
     try {
       const { username, email, password } = req.body;
 
@@ -202,7 +201,7 @@ class AuthController {
           }
         }
       }
-    }
+    },
     $swagger.responses[404] = {
       description: 'Not Found',
       content: {
@@ -213,7 +212,7 @@ class AuthController {
         }
       }
     }
-     */
+    */
     try {
       const accessToken = req.headers.authorization.split(" ")[1];
       const { userId } = jwt.decode(accessToken);

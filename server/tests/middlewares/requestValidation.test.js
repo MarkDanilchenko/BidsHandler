@@ -29,7 +29,7 @@ describe("Request validation middleware:", () => {
     };
     next = jest.fn();
 
-    jest.spyOn(fs, "unlink").mockImplementation(jest.fn());
+    jest.spyOn(fs, "unlink").mockImplementation(() => true);
   });
 
   afterEach(() => {
@@ -56,7 +56,6 @@ describe("Request validation middleware:", () => {
 
     validateRequest(schema)(req, res, next);
 
-    expect(res.status).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalled();
     expect(res.end).toHaveBeenCalled();
@@ -77,11 +76,9 @@ describe("Request validation middleware:", () => {
 
     validateRequest(schema)(req, res, next);
 
-    expect(res.status).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalled();
     expect(res.end).toHaveBeenCalled();
-    expect(fs.unlink).toHaveBeenCalled();
     expect(fs.unlink).toHaveBeenCalledWith("path/to/avatar.jpg", expect.any(Function));
     expect(next).not.toHaveBeenCalled();
   });

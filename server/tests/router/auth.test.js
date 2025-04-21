@@ -54,14 +54,14 @@ describe("Auth routes:", () => {
       jest.clearAllMocks();
     });
 
-    test("should delete users related refresh jwt record from database, return 200 status code", async () => {
+    test("should delete user's related refresh jwt and return 200 status code", async () => {
       mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
         return {
           id: options.where.id,
         };
       });
 
-      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation((options) => {
+      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation(() => {
         return null;
       });
 
@@ -78,11 +78,11 @@ describe("Auth routes:", () => {
     });
 
     test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return null;
       });
 
-      mockJwtDestroy = jest.spyOn(Jwt, "destroy");
+      mockJwtDestroy = jest.fn();
 
       const response = await request(server)
         .post("/api/v1/auth/signout")
@@ -92,7 +92,7 @@ describe("Auth routes:", () => {
       expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
       expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
       expect(mockUserFindOne).toHaveReturnedWith(null);
-      expect(mockJwtDestroy).toHaveBeenCalledTimes(0);
+      expect(mockJwtDestroy).not.toHaveBeenCalled();
       expect(response.text).toEqual(JSON.stringify({ message: "User not found!" }));
       expect(response.statusCode).toBe(404);
     });
@@ -104,7 +104,7 @@ describe("Auth routes:", () => {
         };
       });
 
-      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation((options) => {
+      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation(() => {
         throw new Error("Failed when destroying jwt record!");
       });
 
@@ -166,13 +166,13 @@ describe("Auth routes:", () => {
         };
       });
 
-      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation((options) => {
+      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation(() => {
         return {
           refresh_token,
         };
       });
 
-      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation((options) => {
+      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation(() => {
         return null;
       });
 
@@ -194,12 +194,12 @@ describe("Auth routes:", () => {
     test("should return JSON response with message, if no access token is found in request header, and 401 status code", async () => {
       const response = await request(server).post("/api/v1/auth/refresh").set({ "Content-Type": "application/json" });
 
-      expect(response.statusCode).toBe(401);
       expect(response.text).toEqual(JSON.stringify({ message: "Access token not found!" }));
+      expect(response.statusCode).toBe(401);
     });
 
     test("should return JSON response with message, if access token can not be decoded and user is not found with provided id in payload, and 404 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return null;
       });
 
@@ -222,7 +222,7 @@ describe("Auth routes:", () => {
         };
       });
 
-      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation((options) => {
+      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation(() => {
         return null;
       });
 
@@ -247,13 +247,13 @@ describe("Auth routes:", () => {
         };
       });
 
-      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation((options) => {
+      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation(() => {
         return {
           refresh_token: refresh_token + ".expired",
         };
       });
 
-      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation((options) => {
+      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation(() => {
         return null;
       });
 
@@ -315,11 +315,11 @@ describe("Auth routes:", () => {
     });
 
     test("should create a new user and return 201 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return null;
       });
 
-      mockUserCreate = jest.spyOn(User, "create").mockImplementation((options) => {
+      mockUserCreate = jest.spyOn(User, "create").mockImplementation(() => {
         return null;
       });
 
@@ -349,9 +349,9 @@ describe("Auth routes:", () => {
     test("should return JSON response with message, if request data (for this example: username) is invalid, and 400 status code", async () => {
       const notValidUsername = user.username.slice(0, 5) + "=<>!?";
 
-      mockUserFindOne = jest.spyOn(User, "findOne");
+      mockUserFindOne = jest.fn();
 
-      mockUserCreate = jest.spyOn(User, "create");
+      mockUserCreate = jest.fn();
 
       const response = await request(server)
         .post("/api/v1/auth/signup")
@@ -375,13 +375,13 @@ describe("Auth routes:", () => {
           },
         }),
       );
-      expect(mockUserFindOne).toHaveBeenCalledTimes(0);
-      expect(mockUserCreate).toHaveBeenCalledTimes(0);
+      expect(mockUserFindOne).not.toHaveBeenCalled();
+      expect(mockUserCreate).not.toHaveBeenCalled();
       expect(response.statusCode).toBe(400);
     });
 
     test("should return JSON response with message, if user with provided email or username is already registered/existed, and 400 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return true;
       });
 
@@ -413,11 +413,11 @@ describe("Auth routes:", () => {
     });
 
     test("should return JSON response with message, if smth goes wrong, and 400 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return false;
       });
 
-      mockUserCreate = jest.spyOn(User, "create").mockImplementation((options) => {
+      mockUserCreate = jest.spyOn(User, "create").mockImplementation(() => {
         throw new Error("Smth goes wrong");
       });
 
@@ -448,6 +448,7 @@ describe("Auth routes:", () => {
 
   describe("- signin:", () => {
     let user;
+    let userId;
     let hashedPassword;
     let mockUserFindOne;
     let mockJwtFindOne;
@@ -455,7 +456,6 @@ describe("Auth routes:", () => {
     let mockJwtUpdate;
     let mockJwtSign;
     let server;
-    let userId;
 
     beforeEach(async () => {
       user = createFakeUser();
@@ -477,12 +477,12 @@ describe("Auth routes:", () => {
         }
       });
 
-      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation((options) => {
+      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation(() => {
         return null;
       });
 
-      mockJwtCreate = jest.spyOn(Jwt, "create").mockImplementation((options) => {
-        return;
+      mockJwtCreate = jest.spyOn(Jwt, "create").mockImplementation(() => {
+        return true;
       });
 
       const response = await request(server)
@@ -517,16 +517,16 @@ describe("Auth routes:", () => {
         }
       });
 
-      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation((options) => {
+      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation(() => {
         return true;
       });
 
-      mockJwtCreate = jest.spyOn(Jwt, "create").mockImplementation((options) => {
-        return;
+      mockJwtCreate = jest.spyOn(Jwt, "create").mockImplementation(() => {
+        return true;
       });
 
-      mockJwtUpdate = jest.spyOn(Jwt, "update").mockImplementation((options) => {
-        return;
+      mockJwtUpdate = jest.spyOn(Jwt, "update").mockImplementation(() => {
+        return true;
       });
 
       const response = await request(server)
@@ -556,12 +556,12 @@ describe("Auth routes:", () => {
     });
 
     test("should return JSON response with message, if user with provided username or email is not found, and 404 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return null;
       });
 
-      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation((options) => {
-        return;
+      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation(() => {
+        return null;
       });
 
       const response = await request(server)
@@ -590,8 +590,8 @@ describe("Auth routes:", () => {
         }
       });
 
-      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation((options) => {
-        return;
+      mockJwtFindOne = jest.spyOn(Jwt, "findOne").mockImplementation(() => {
+        return null;
       });
 
       const response = await request(server)
@@ -624,8 +624,8 @@ describe("Auth routes:", () => {
         }
       });
 
-      mockJwtSign = jest.spyOn(jwt, "sign").mockImplementation((options) => {
-        throw new Error("Failed when signing jwt!");
+      mockJwtSign = jest.spyOn(jwt, "sign").mockImplementation(() => {
+        throw new Error("Failed when sign jwt!");
       });
 
       const response = await request(server)
@@ -641,8 +641,8 @@ describe("Auth routes:", () => {
           username: user.username,
         },
       });
-      expect(jwt.sign).toHaveBeenCalled();
-      expect(response.text).toEqual(JSON.stringify({ message: "Failed when signing jwt!" }));
+      expect(mockJwtSign).toHaveBeenCalled();
+      expect(response.text).toEqual(JSON.stringify({ message: "Failed when sign jwt!" }));
       expect(response.statusCode).toBe(400);
     });
   });

@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
+import fs from "fs";
+import crypto from "crypto";
 import { Jwt, User } from "#server/models/index.js";
 import { badRequestError, notFoundError, unauthorizedError } from "../utils/errors.js";
-import fs from "fs";
 import logger from "#server/services/loggerConfig.js";
-import crypto from "crypto";
 
 class UserController {
   async retrieveProfile(req, res) {
@@ -92,6 +92,16 @@ class UserController {
         'application/json': {
           schema: {
             $ref: '#/components/schemas/Response400Schema'
+          }
+        }
+      }
+    },
+    #swagger.responses[401] = {
+      description: 'Unauthorized',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response401Schema'
           }
         }
       }

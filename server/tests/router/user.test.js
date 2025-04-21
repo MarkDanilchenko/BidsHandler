@@ -1,13 +1,13 @@
 import request from "supertest";
+import fs from "fs";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { sequelizeConnection } from "#server/models/index.js";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, jest, test } from "@jest/globals";
-import jwt from "jsonwebtoken";
 import { createFakeUser } from "#server/tests/fixtures/user.js";
 import { User, Jwt } from "#server/models/index.js";
 import { v4 as uuidv4 } from "uuid";
 import { unauthorizedError } from "#server/utils/errors.js";
-import crypto from "crypto";
-import fs from "fs";
 
 describe("User routes:", () => {
   beforeAll(async () => {
@@ -83,7 +83,7 @@ describe("User routes:", () => {
     });
 
     test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return null;
       });
 
@@ -101,7 +101,7 @@ describe("User routes:", () => {
     });
 
     test("should return JSON response with message, if User.findOne or smth else throws an error, and 400 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         throw new Error("Failed when finding user!");
       });
 
@@ -171,8 +171,8 @@ describe("User routes:", () => {
         };
       });
 
-      mockUserUpdate = jest.spyOn(User, "update").mockImplementation((options) => {
-        return;
+      mockUserUpdate = jest.spyOn(User, "update").mockImplementation(() => {
+        return true;
       });
 
       const response = await request(server)
@@ -213,12 +213,12 @@ describe("User routes:", () => {
     });
 
     test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return null;
       });
 
-      mockUserUpdate = jest.spyOn(User, "update").mockImplementation((options) => {
-        return;
+      mockUserUpdate = jest.spyOn(User, "update").mockImplementation(() => {
+        return true;
       });
 
       const response = await request(server)
@@ -252,7 +252,7 @@ describe("User routes:", () => {
         };
       });
 
-      mockUserUpdate = jest.spyOn(User, "update").mockImplementation((options) => {
+      mockUserUpdate = jest.spyOn(User, "update").mockImplementation(() => {
         throw new Error("Something went wrong!");
       });
 
@@ -295,12 +295,17 @@ describe("User routes:", () => {
     });
 
     test("should return JSON response with message, if provided data for update (for example: firstName or lastName) is not valid, and 400 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
-        return;
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
+        return {
+          ...user,
+          id: userId,
+          password: hashedPassword,
+          avatar: null,
+        };
       });
 
-      mockUserUpdate = jest.spyOn(User, "update").mockImplementation((options) => {
-        return;
+      mockUserUpdate = jest.spyOn(User, "update").mockImplementation(() => {
+        return true;
       });
 
       const response = await request(server)
@@ -369,15 +374,15 @@ describe("User routes:", () => {
     });
 
     test("should destroy user profile and return 200 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return true;
       });
 
-      mockUserDestroy = jest.spyOn(User, "destroy").mockImplementation((options) => {
+      mockUserDestroy = jest.spyOn(User, "destroy").mockImplementation(() => {
         return null;
       });
 
-      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation((options) => {
+      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation(() => {
         return null;
       });
 
@@ -398,7 +403,7 @@ describe("User routes:", () => {
     });
 
     test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return null;
       });
 
@@ -416,15 +421,15 @@ describe("User routes:", () => {
     });
 
     test("should return JSON response with message, if User.destroy or smth else throws an error, and 400 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return true;
       });
 
-      mockUserDestroy = jest.spyOn(User, "destroy").mockImplementation((options) => {
+      mockUserDestroy = jest.spyOn(User, "destroy").mockImplementation(() => {
         throw new Error("Something went wrong!");
       });
 
-      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation((options) => {
+      mockJwtDestroy = jest.spyOn(Jwt, "destroy").mockImplementation(() => {
         return null;
       });
 
@@ -465,7 +470,7 @@ describe("User routes:", () => {
     });
 
     test("should restore user profile and return 200 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return {
           ...user,
           id: userId,
@@ -474,7 +479,7 @@ describe("User routes:", () => {
         };
       });
 
-      mockUserRestore = jest.spyOn(User, "restore").mockImplementation((options) => {
+      mockUserRestore = jest.spyOn(User, "restore").mockImplementation(() => {
         return null;
       });
 
@@ -499,11 +504,11 @@ describe("User routes:", () => {
     });
 
     test("should return JSON response with message, if user is not found with provided username or email, and 404 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return null;
       });
 
-      mockUserRestore = jest.spyOn(User, "restore").mockImplementation((options) => {
+      mockUserRestore = jest.spyOn(User, "restore").mockImplementation(() => {
         return null;
       });
 
@@ -523,7 +528,7 @@ describe("User routes:", () => {
     });
 
     test("should return JSON response with message, if provided password is not valid, and 401 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return {
           ...user,
           id: userId,
@@ -532,7 +537,7 @@ describe("User routes:", () => {
         };
       });
 
-      mockUserRestore = jest.spyOn(User, "restore").mockImplementation((options) => {
+      mockUserRestore = jest.spyOn(User, "restore").mockImplementation(() => {
         return null;
       });
 
@@ -557,7 +562,7 @@ describe("User routes:", () => {
     });
 
     test("should return JSON response with message, if User.restore or smth else throws an error, and 400 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return {
           ...user,
           id: userId,
@@ -566,7 +571,7 @@ describe("User routes:", () => {
         };
       });
 
-      mockUserRestore = jest.spyOn(User, "restore").mockImplementation((options) => {
+      mockUserRestore = jest.spyOn(User, "restore").mockImplementation(() => {
         throw new Error("Something went wrong!");
       });
 

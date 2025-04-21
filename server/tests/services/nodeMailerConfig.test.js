@@ -1,7 +1,7 @@
-import sendEmail from "#server/services/nodeMailerConfig.js";
 import nodemailer from "nodemailer";
-import logger from "#server/services/loggerConfig.js";
 import { afterEach, beforeEach, expect, jest, test } from "@jest/globals";
+import logger from "#server/services/loggerConfig.js";
+import sendEmail from "#server/services/nodeMailerConfig.js";
 
 describe("sendEmail", () => {
   const mockedMailOptions = {

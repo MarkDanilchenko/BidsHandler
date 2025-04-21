@@ -39,6 +39,7 @@ describe("Generator of the response mails, for the bids processing", () => {
 
   test("should join an array of recipients with a comma and a space", () => {
     const mail = mailConfigurator(["to1", "to2"], options.subject, options.text);
+
     expect(mail.to).toBe("to1, to2");
   });
 
