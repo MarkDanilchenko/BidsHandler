@@ -21,6 +21,7 @@ describe("Bids routes:", () => {
       message: "Test message",
       authorId: userId,
     };
+    let mockUserFindOne;
     let mockBidCreate;
     let server;
 
@@ -54,8 +55,12 @@ describe("Bids routes:", () => {
     });
 
     test("should create a new bid", async () => {
-      mockBidCreate = jest.spyOn(Bid, "create").mockImplementation((options) => {
-        return null;
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
+        return true;
+      });
+
+      mockBidCreate = jest.spyOn(Bid, "create").mockImplementation(() => {
+        return true;
       });
 
       const response = await request(server)
@@ -68,14 +73,18 @@ describe("Bids routes:", () => {
 
       expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
       expect(jwt.decode).toHaveReturnedWith({ userId });
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith(true);
       expect(mockBidCreate).toHaveBeenCalledWith(options);
       expect(mockBidCreate).toHaveReturnedWith(null);
       expect(response.statusCode).toBe(200);
     });
 
-    test("should return JSON response with message, if user is not found with provided id in jwt payload while creating a new bid, and 400 status code", async () => {
-      mockBidCreate = jest.spyOn(Bid, "create").mockImplementation((options) => {
-        throw new Error('insert or update on table "bids" violates foreign key constraint "bids_authorId_fkey"');
+    test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => null);
+
+      mockBidCreate = jest.spyOn(Bid, "create").mockImplementation(() => {
+        return true;
       });
 
       const response = await request(server)
@@ -88,13 +97,15 @@ describe("Bids routes:", () => {
 
       expect(jwt.decode).toHaveBeenCalledWith("validAccessToken");
       expect(jwt.decode).toHaveReturnedWith({ userId });
-      expect(mockBidCreate).toHaveBeenCalledWith(options);
+      expect(mockUserFindOne).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockUserFindOne).toHaveReturnedWith(null);
+      expect(mockBidCreate).not.toHaveBeenCalled();
       expect(response.text).toEqual(
         JSON.stringify({
-          message: 'insert or update on table "bids" violates foreign key constraint "bids_authorId_fkey"',
+          message: "User not found!",
         }),
       );
-      expect(response.statusCode).toBe(400);
+      expect(response.statusCode).toBe(404);
     });
   });
 
@@ -233,7 +244,7 @@ describe("Bids routes:", () => {
     });
 
     test("should return one bid info and 200 status code", async () => {
-      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => {
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation(() => {
         return {
           id: bidId,
           status: "pending",
@@ -264,7 +275,7 @@ describe("Bids routes:", () => {
     });
 
     test("should return JSON response with message, if bid is not found, and 404 status code", async () => {
-      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => {
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation(() => {
         return null;
       });
 
@@ -280,7 +291,7 @@ describe("Bids routes:", () => {
     });
 
     test("should return JSON response with message, if Bid.findOne or smth else throws an error, and 400 status code", async () => {
-      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => {
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation(() => {
         throw new Error("Smth goes wrong");
       });
 
@@ -334,7 +345,7 @@ describe("Bids routes:", () => {
     });
 
     test("should process one bid, send an email and return 200 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return {
           id: userId,
           username: user.username,
@@ -343,9 +354,9 @@ describe("Bids routes:", () => {
         };
       });
 
-      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => true);
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation(() => true);
 
-      mockBidUpdate = jest.spyOn(Bid, "update").mockImplementation((options) => true);
+      mockBidUpdate = jest.spyOn(Bid, "update").mockImplementation(() => true);
 
       const response = await request(server)
         .patch(`/api/v1/bids/${bidId}`)
@@ -372,7 +383,7 @@ describe("Bids routes:", () => {
     });
 
     test("should return JSON response with message, if user is not found with provided id in jwt payload, and 404 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => null);
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => null);
 
       const response = await request(server)
         .patch(`/api/v1/bids/${bidId}`)
@@ -391,7 +402,7 @@ describe("Bids routes:", () => {
     });
 
     test("should return JSON response with message, if user is not admin, and 401 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return {
           id: userId,
           username: user.username,
@@ -422,7 +433,7 @@ describe("Bids routes:", () => {
     });
 
     test("should return JSON response with message, if bid is not found, and 404 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return {
           id: userId,
           username: user.username,
@@ -431,7 +442,7 @@ describe("Bids routes:", () => {
         };
       });
 
-      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => {
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation(() => {
         return null;
       });
 
@@ -459,7 +470,7 @@ describe("Bids routes:", () => {
     });
 
     test("should return JSON response with message, if Bid.update or smth else throws an error, and 400 status code", async () => {
-      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation((options) => {
+      mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => {
         return {
           id: userId,
           username: user.username,
@@ -468,11 +479,11 @@ describe("Bids routes:", () => {
         };
       });
 
-      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation((options) => {
+      mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation(() => {
         return true;
       });
 
-      mockBidUpdate = jest.spyOn(Bid, "update").mockImplementation((options) => {
+      mockBidUpdate = jest.spyOn(Bid, "update").mockImplementation(() => {
         throw new Error("Smth goes wrong");
       });
 

@@ -1,7 +1,7 @@
 import request from "supertest";
+import jwt from "jsonwebtoken";
 import { afterAll, beforeAll, beforeEach, expect, jest } from "@jest/globals";
 import { sequelizeConnection, User, Bid, Comment } from "#server/models/index.js";
-import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { unauthorizedError } from "#server/utils/errors.js";
 
@@ -340,11 +340,8 @@ describe("BidComments routes:", () => {
 
     test("should edit comment, that is related to bid and user and return 200 status code", async () => {
       mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => true);
-
       mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation(() => true);
-
       mockCommentFindOne = jest.spyOn(Comment, "findOne").mockImplementation(() => true);
-
       mockCommentUpdate = jest.spyOn(Comment, "update").mockImplementation(() => true);
 
       const response = await request(server)
@@ -396,7 +393,6 @@ describe("BidComments routes:", () => {
       mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => true);
       mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation(() => true);
       mockCommentFindOne = jest.spyOn(Comment, "findOne").mockImplementation(() => true);
-
       mockCommentUpdate = jest.spyOn(Comment, "update").mockImplementation(() => {
         throw new Error("Smth goes wrong");
       });
@@ -464,11 +460,8 @@ describe("BidComments routes:", () => {
 
     test("should delete comment, that is related to bid and user and return 200 status code", async () => {
       mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => true);
-
       mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation(() => true);
-
       mockCommentFindOne = jest.spyOn(Comment, "findOne").mockImplementation(() => true);
-
       mockCommentDestroy = jest.spyOn(Comment, "destroy").mockImplementation(() => true);
 
       const response = await request(server)
@@ -487,11 +480,8 @@ describe("BidComments routes:", () => {
 
     test("should return JSON response with message, if related bid/comment/user is not found, and 404 status code", async () => {
       mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => true);
-
       mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation(() => null);
-
       mockCommentFindOne = jest.fn();
-
       mockCommentDestroy = jest.fn();
 
       const response = await request(server)
@@ -511,11 +501,8 @@ describe("BidComments routes:", () => {
 
     test("should return JSON response with message, if Comment.destroy or smth else throws an error, and 400 status code", async () => {
       mockUserFindOne = jest.spyOn(User, "findOne").mockImplementation(() => true);
-
       mockBidFindOne = jest.spyOn(Bid, "findOne").mockImplementation(() => true);
-
       mockCommentFindOne = jest.spyOn(Comment, "findOne").mockImplementation(() => true);
-
       mockCommentDestroy = jest.spyOn(Comment, "destroy").mockImplementation(() => {
         throw new Error("Smth goes wrong");
       });

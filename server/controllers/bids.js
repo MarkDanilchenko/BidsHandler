@@ -51,6 +51,14 @@ class BidsController {
       const { userId } = jwt.decode(accessToken);
       const { message } = req.body;
 
+      if (!message) {
+        return badRequestError(res, "Message is required!");
+      }
+      const user = await User.findOne({ where: { id: userId } });
+      if (!user) {
+        return notFoundError(res, "User not found!");
+      }
+
       const options = {
         message,
         authorId: userId,

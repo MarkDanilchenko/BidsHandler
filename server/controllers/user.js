@@ -179,6 +179,16 @@ class UserController {
         }
       }
     },
+    #swagger.responses[401] = {
+      description: 'Unauthorized',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/Response401Schema'
+          }
+        }
+      }
+    },
     #swagger.responses[404] = {
       description: 'Not Found',
       content: {
