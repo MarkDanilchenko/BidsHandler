@@ -1,26 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="description"
+      content="This API based on NodeJS (ExpressJS) and provides service to handle bids from users. Users could form their bids and admins of the service could handle it anyhow with email response."
+    />
+    <meta name="keywords" content="NodeJS, ExpressJS, HTML, CSS, JavaScript, Docker, PostgreSQL" />
+    <link rel="shortcut icon" href="/static/IMG/favicon_lg.png" type="image/x-icon" />
+    <title>BidsHandler</title>
+  </head>
 
-<head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-	<meta name="description"
-		content="This API based on NodeJS (ExpressJS) and provides service to handle bids from users. Users could form their bids and admins of the service could handle it anyhow with email response." />
-	<meta name="keywords" content="NodeJS, ExpressJS, HTML, CSS, JavaScript, Docker, PostgreSQL" />
-	<link rel="shortcut icon" href="/static/IMG/favicon_lg.png" type="image/x-icon" />
-	<title>BidsHandler</title>
-</head>
+  <body>
+    <noscript>Please enable JavaScript for this page.</noscript>
+    <div class="container">
+      <header class="my-header">{% include 'startPage/header.html' %}</header>
+      <main class="my-main">{% block content %}{% endblock %}</main>
+      <footer class="my-footer">{% include 'startPage/footer.html' %}</footer>
+    </div>
 
-<body>
-	<noscript>Please enable JavaScript for this page.</noscript>
-	<div class="container">
-		<header class="my-header">{% include 'startPage/header.html' %}</header>
-		<main class="my-main">{% block content %}{% endblock %}</main>
-		<footer class="my-footer">{% include 'startPage/footer.html' %}</footer>
-	</div>
-
-	<script src="/static/dist/bundle.js"></script>
-</body>
-
+    <script src="/static/dist/bundle.js"></script>
+  </body>
 </html>
