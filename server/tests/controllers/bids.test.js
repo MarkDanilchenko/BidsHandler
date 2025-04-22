@@ -60,7 +60,7 @@ describe("Bids routes:", () => {
       });
 
       mockBidCreate = jest.spyOn(Bid, "create").mockImplementation(() => {
-        return true;
+        return null;
       });
 
       const response = await request(server)
