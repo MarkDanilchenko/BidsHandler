@@ -31,10 +31,6 @@ const docConfig = {
       name: "Bids&Comments",
       description: "Bids end-points",
     },
-    {
-      name: "Redirect",
-      description: "Redirect to the API home page",
-    },
   ],
   components: {
     "@schemas": {

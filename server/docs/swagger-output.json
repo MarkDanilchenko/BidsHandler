@@ -27,36 +27,9 @@
     {
       "name": "Bids&Comments",
       "description": "Bids end-points"
-    },
-    {
-      "name": "Redirect",
-      "description": "Redirect to the API home page"
     }
   ],
   "paths": {
-    "/": {
-      "get": {
-        "tags": ["Redirect"],
-        "summary": "Redirect to the API home page.",
-        "description": "This is a redirect to the API home page.",
-        "operationId": "redirect",
-        "responses": {
-          "302": {
-            "description": "Redirect to the API home page.",
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string",
-                  "format": "string",
-                  "example": "http://localhost:3000/api/v1/",
-                  "description": "API home page URL."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/auth/signup": {
       "post": {
         "tags": ["Reg&Auth"],

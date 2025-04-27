@@ -55,25 +55,9 @@ server.get("/api/v1/docs/swagger-output.json", (req, res) => {
 });
 server.use("/api/v1/docs", swaggerUI.serveFiles(null, swaggerUIOptions), swaggerUI.setup(null, swaggerUIOptions));
 
-server.get("/", (req, res) => {
+server.all("/", (req, res) => {
   /*
-  #swagger.tags = ['Redirect']
-  #swagger.summary = 'Redirect to the API home page.'
-  #swagger.description = 'This is a redirect to the API home page.'
-  #swagger.operationId = 'redirect'
-  #swagger.responses[302] = {
-    description: 'Redirect to the API home page.',
-    content: {
-      'text/html': {
-        schema: {
-          type: 'string',
-          format: 'string',
-          example: 'http://localhost:3000/api/v1/',
-          description: 'API home page URL.',
-        }
-      }
-    }
-  }
+  #swagger.ignore = true
   */
   res.status(302).redirect("/api/v1/");
 });
